@@ -58,24 +58,34 @@ def fetch(
 ) -> list[dict]:
     """Run an Overpass query and return the raw element list.
 
-    Overpass is a shared public resource; transient 429/504 responses are
-    retried with a backoff.
+    Overpass is a shared public resource; transient errors — rate limits,
+    gateway timeouts, and read timeouts on heavy queries — are retried with a
+    backoff.
     """
     import requests
 
     session = session or requests.Session()
-    query = build_query(bbox)
+    query = build_query(bbox, timeout=240)
     headers = {"User-Agent": _USER_AGENT}
+    last_error: Exception | None = None
     for attempt in range(retries):
-        response = session.post(
-            OVERPASS_URL, data={"data": query}, headers=headers, timeout=180
-        )
-        if response.status_code in (429, 504, 503):
+        try:
+            response = session.post(
+                OVERPASS_URL, data={"data": query}, headers=headers, timeout=300
+            )
+        except requests.exceptions.RequestException as error:
+            last_error = error
+            time.sleep(5 * (attempt + 1))
+            continue
+        if response.status_code in (429, 503, 504):
+            last_error = RuntimeError(f"HTTP {response.status_code}")
             time.sleep(5 * (attempt + 1))
             continue
         response.raise_for_status()
         return response.json().get("elements", [])
-    raise RuntimeError(f"Overpass API kept rejecting the query after {retries} retries")
+    raise RuntimeError(
+        f"Overpass API request failed after {retries} retries: {last_error}"
+    )
 
 
 def _coords(element: dict) -> tuple[float | None, float | None]:
