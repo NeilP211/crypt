@@ -18,6 +18,10 @@ if TYPE_CHECKING:
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 
+# Overpass rejects requests with the default `python-requests` user agent
+# (HTTP 406), so identify the client explicitly.
+_USER_AGENT = "crypt-ingest/0.1 (+https://github.com/neilpatel/crypt)"
+
 # A few ready-made bounding boxes (south, west, north, east) for the CLI.
 REGIONS: dict[str, tuple[float, float, float, float]] = {
     "berlin": (52.34, 13.09, 52.68, 13.76),
@@ -61,9 +65,10 @@ def fetch(
 
     session = session or requests.Session()
     query = build_query(bbox)
+    headers = {"User-Agent": _USER_AGENT}
     for attempt in range(retries):
         response = session.post(
-            OVERPASS_URL, data={"data": query}, timeout=180
+            OVERPASS_URL, data={"data": query}, headers=headers, timeout=180
         )
         if response.status_code in (429, 504, 503):
             time.sleep(5 * (attempt + 1))
