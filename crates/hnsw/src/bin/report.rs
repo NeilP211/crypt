@@ -19,10 +19,7 @@ use hnsw::{HnswConfig, HnswIndex, Metric};
 
 fn main() {
     let mut args = std::env::args().skip(1);
-    let n: usize = args
-        .next()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(100_000);
+    let n: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(100_000);
     let dim: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(128);
 
     let n_queries = 1_000usize;
@@ -121,7 +118,11 @@ fn main() {
     writeln!(md, "| Dimension | {dim} |").unwrap();
     writeln!(md, "| Clusters | {n_clusters} |").unwrap();
     writeln!(md, "| Metric | Cosine |").unwrap();
-    writeln!(md, "| Query set | {n_queries} perturbed neighbors of indexed vectors |").unwrap();
+    writeln!(
+        md,
+        "| Query set | {n_queries} perturbed neighbors of indexed vectors |"
+    )
+    .unwrap();
     writeln!(md, "| k | {k} |").unwrap();
     writeln!(md, "| M | {m} |").unwrap();
     writeln!(md, "| ef_construction | {ef_construction} |").unwrap();
@@ -169,7 +170,11 @@ fn main() {
     } else {
         "above the 2 pp recall target — raise ef_search to close it"
     };
-    writeln!(md, "- Recall gap to exact kNN: **{gap:.2} pp** — {verdict}.").unwrap();
+    writeln!(
+        md,
+        "- Recall gap to exact kNN: **{gap:.2} pp** — {verdict}."
+    )
+    .unwrap();
     let fastest_good = rows.iter().find(|r| r.recall >= 0.95);
     if let Some(r) = fastest_good {
         writeln!(

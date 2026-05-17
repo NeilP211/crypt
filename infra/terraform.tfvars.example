@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars and fill in real values before `terraform apply`.
+
+region            = "us-east-1"
+project           = "crypt"
+db_password       = "use-a-strong-password"
+jwt_secret        = "use-a-long-random-string"
+container_image   = "ghcr.io/neilpatel/crypt-server:latest"
+desired_count     = 2
+
+# Optional: set a custom domain to provision Route53 + ACM.
+# domain_name     = "crypt.example.com"

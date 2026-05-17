@@ -154,8 +154,7 @@ async fn login(
 ) -> AppResult<Json<AuthResponse>> {
     let email = req.email.trim().to_lowercase();
     let found = db::users::find_by_email(&state.db, &email).await?;
-    let (user, hash) =
-        found.ok_or_else(|| AppError::Unauthorized("invalid credentials".into()))?;
+    let (user, hash) = found.ok_or_else(|| AppError::Unauthorized("invalid credentials".into()))?;
     if !crate::auth::password::verify_password(&req.password, &hash) {
         return Err(AppError::Unauthorized("invalid credentials".into()));
     }
@@ -356,7 +355,9 @@ async fn list_contributions(
     State(state): State<AppState>,
     AuthUser(user_id): AuthUser,
 ) -> AppResult<Json<Vec<Contribution>>> {
-    Ok(Json(db::users::list_contributions(&state.db, user_id).await?))
+    Ok(Json(
+        db::users::list_contributions(&state.db, user_id).await?,
+    ))
 }
 
 // --- operational handlers -------------------------------------------------
@@ -459,7 +460,10 @@ mod tests {
 
     #[test]
     fn split_filter_trims_and_drops_empties() {
-        assert_eq!(split_filter("factory, hospital ,"), vec!["factory", "hospital"]);
+        assert_eq!(
+            split_filter("factory, hospital ,"),
+            vec!["factory", "hospital"]
+        );
         assert!(split_filter("  ").is_empty());
     }
 }

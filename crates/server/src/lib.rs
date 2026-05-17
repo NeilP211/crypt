@@ -122,14 +122,18 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .with_context(|| format!("binding REST listener on {rest_addr}"))?;
     let rest = async {
-        axum::serve(listener, api::rest::router(state.clone()).into_make_service())
-            .await
-            .map_err(anyhow::Error::from)
+        axum::serve(
+            listener,
+            api::rest::router(state.clone()).into_make_service(),
+        )
+        .await
+        .map_err(anyhow::Error::from)
     };
 
     // gRPC server.
-    let grpc_service =
-        crypt_proto::SearchServiceServer::new(GrpcSearch { state: state.clone() });
+    let grpc_service = crypt_proto::SearchServiceServer::new(GrpcSearch {
+        state: state.clone(),
+    });
     let grpc = async {
         tonic::transport::Server::builder()
             .add_service(grpc_service)

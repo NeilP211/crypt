@@ -99,7 +99,10 @@ pub fn perturbed_queries(
     (0..n_queries)
         .map(|_| {
             let src = &base[rng.gen_range(0..base.len())];
-            let mut v: Vec<f32> = src.iter().map(|&x| x + noise * gaussian(&mut rng)).collect();
+            let mut v: Vec<f32> = src
+                .iter()
+                .map(|&x| x + noise * gaussian(&mut rng))
+                .collect();
             normalize(&mut v);
             v
         })

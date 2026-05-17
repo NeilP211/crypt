@@ -312,9 +312,9 @@ impl HnswIndex {
                 break;
             }
             let cand_vec = self.vector(cand.id);
-            let keep = selected.iter().all(|&r| {
-                self.config.metric.distance(cand_vec, self.vector(r)) >= cand.dist
-            });
+            let keep = selected
+                .iter()
+                .all(|&r| self.config.metric.distance(cand_vec, self.vector(r)) >= cand.dist);
             if keep {
                 selected.push(cand.id);
             }

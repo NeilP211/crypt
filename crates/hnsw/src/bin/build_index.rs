@@ -24,8 +24,12 @@ fn read_u32(reader: &mut impl Read) -> std::io::Result<u32> {
 
 fn main() {
     let mut args = std::env::args().skip(1);
-    let input = args.next().unwrap_or_else(|| "data/embeddings.bin".to_string());
-    let output = args.next().unwrap_or_else(|| "data/crypt.index".to_string());
+    let input = args
+        .next()
+        .unwrap_or_else(|| "data/embeddings.bin".to_string());
+    let output = args
+        .next()
+        .unwrap_or_else(|| "data/crypt.index".to_string());
 
     let mut file = std::fs::File::open(&input)
         .unwrap_or_else(|e| panic!("cannot open embeddings file '{input}': {e}"));

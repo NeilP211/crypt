@@ -1,6 +1,7 @@
 # Multi-stage build for the Rust backend. Build context is the repo root.
 
-FROM rust:1.83-slim AS builder
+# Latest stable Rust — some transitive crates require a recent toolchain.
+FROM rust:1-slim AS builder
 RUN apt-get update \
     && apt-get install -y --no-install-recommends protobuf-compiler pkg-config \
     && rm -rf /var/lib/apt/lists/*

@@ -46,10 +46,11 @@ pub async fn run_search(state: &AppState, query: SearchQuery) -> AppResult<Vec<S
     // 1. Approximate nearest neighbors from the HNSW index.
     let candidate_n = (query.limit * OVERFETCH).clamp(query.limit.max(1), MAX_CANDIDATES);
     let ef = candidate_n.max(64);
-    let hits = state.index.search_with_ef(&query.embedding, candidate_n, ef);
+    let hits = state
+        .index
+        .search_with_ef(&query.embedding, candidate_n, ef);
     let embedding_ids: Vec<i32> = hits.iter().map(|(id, _)| *id as i32).collect();
-    let vector_distance: HashMap<i32, f32> =
-        hits.iter().map(|(id, d)| (*id as i32, *d)).collect();
+    let vector_distance: HashMap<i32, f32> = hits.iter().map(|(id, d)| (*id as i32, *d)).collect();
 
     // 2. Hydrate from PostGIS, computing geographic distance in the same query.
     let candidates =

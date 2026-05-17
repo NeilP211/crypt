@@ -16,9 +16,13 @@ pub fn init_tracing() {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     let registry = tracing_subscriber::registry().with(filter);
     if std::env::var("LOG_FORMAT").as_deref() == Ok("json") {
-        registry.with(tracing_subscriber::fmt::layer().json()).init();
+        registry
+            .with(tracing_subscriber::fmt::layer().json())
+            .init();
     } else {
-        registry.with(tracing_subscriber::fmt::layer().compact()).init();
+        registry
+            .with(tracing_subscriber::fmt::layer().compact())
+            .init();
     }
 }
 
@@ -71,7 +75,9 @@ impl Metrics {
         registry.register(Box::new(search_latency.clone())).unwrap();
         registry.register(Box::new(cache_hits.clone())).unwrap();
         registry.register(Box::new(cache_misses.clone())).unwrap();
-        registry.register(Box::new(indexed_vectors.clone())).unwrap();
+        registry
+            .register(Box::new(indexed_vectors.clone()))
+            .unwrap();
 
         Self {
             registry,

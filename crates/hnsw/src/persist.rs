@@ -39,8 +39,7 @@ impl From<io::Error> for PersistError {
 impl HnswIndex {
     /// Serialize the index to `path`, overwriting any existing file.
     pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), PersistError> {
-        let bytes =
-            bincode::serialize(self).map_err(|e| PersistError::Codec(e.to_string()))?;
+        let bytes = bincode::serialize(self).map_err(|e| PersistError::Codec(e.to_string()))?;
         fs::write(path, bytes)?;
         Ok(())
     }

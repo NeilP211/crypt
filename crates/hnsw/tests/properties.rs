@@ -95,8 +95,11 @@ fn higher_ef_never_reduces_recall() {
         let mut total = 0.0;
         for q in &queries {
             let exact = brute_force_knn(&base, q, 10, Metric::Cosine);
-            let approx: Vec<u32> =
-                index.search_with_ef(q, 10, ef).iter().map(|(id, _)| *id).collect();
+            let approx: Vec<u32> = index
+                .search_with_ef(q, 10, ef)
+                .iter()
+                .map(|(id, _)| *id)
+                .collect();
             total += recall(&approx, &exact);
         }
         total / queries.len() as f32
