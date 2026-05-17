@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-950 text-haze-200 antialiased;
+}
+
+/* Theme the MapLibre controls and popups to match the dark palette. */
+.maplibregl-popup-content {
+  @apply rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 shadow-lg;
+}
+
+.maplibregl-popup-tip {
+  display: none;
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  @apply bg-ink-900/80 text-haze-400;
+}
+
+.maplibregl-ctrl-group {
+  @apply border border-ink-600 bg-ink-800;
+}
+
+.maplibregl-ctrl-group button {
+  filter: invert(0.85);
+}
