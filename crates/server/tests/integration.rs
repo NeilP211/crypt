@@ -5,7 +5,7 @@
 //!
 //! ```text
 //! docker compose -f deploy/docker-compose.yml up -d postgres
-//! TEST_DATABASE_URL=postgres://crypt:crypt@localhost:5432/crypt \
+//! TEST_DATABASE_URL=postgres://crypt:crypt@localhost:5433/crypt \
 //!     cargo test -p crypt-server -- --ignored
 //! ```
 
