@@ -13,3 +13,4 @@ data/
 *.tfstate*
 models/
 .venv/
+*.egg-info/
