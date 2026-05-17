@@ -1,0 +1,15 @@
+target/
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.env
+.env.local
+*.log
+data/
+*.index
+.DS_Store
+.terraform/
+*.tfstate*
+models/
+.venv/
