@@ -23,6 +23,10 @@ harness = false
 name = "hnsw-report"
 path = "src/bin/report.rs"
 
+[[bin]]
+name = "build-index"
+path = "src/bin/build_index.rs"
+
 [lib]
 name = "hnsw"
 path = "src/lib.rs"

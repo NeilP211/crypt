@@ -1,0 +1,72 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API",
+  "elements": [
+    {
+      "type": "node",
+      "id": 101,
+      "lat": 52.5145,
+      "lon": 13.4036,
+      "tags": {
+        "name": "Spreepark",
+        "abandoned": "yes",
+        "building": "industrial",
+        "start_date": "1969",
+        "description": "Disused amusement park in Plänterwald",
+        "image": "https://example.org/img/spreepark.jpg"
+      }
+    },
+    {
+      "type": "way",
+      "id": 202,
+      "center": { "lat": 52.5201, "lon": 13.4090 },
+      "tags": {
+        "name": "Old Garrison Chapel",
+        "historic": "chapel",
+        "wikimedia_commons": "File:Old Garrison Chapel Berlin.jpg"
+      }
+    },
+    {
+      "type": "node",
+      "id": 303,
+      "lat": 42.3314,
+      "lon": -83.0458,
+      "tags": {
+        "name": "Eloise Asylum",
+        "building": "hospital",
+        "abandoned": "yes",
+        "check_date": "2023-06-01",
+        "image": "https://example.org/img/eloise.jpg"
+      }
+    },
+    {
+      "type": "node",
+      "id": 404,
+      "lat": 51.5012,
+      "lon": -0.1248,
+      "tags": {
+        "historic": "castle",
+        "start_date": "1180",
+        "ruins": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 505,
+      "tags": {
+        "name": "Coordinate-less Ruin",
+        "historic": "ruins"
+      }
+    },
+    {
+      "type": "relation",
+      "id": 606,
+      "center": { "lat": 48.8606, "lon": 2.3376 },
+      "tags": {
+        "historic": "bunker",
+        "military": "bunker",
+        "demolished": "yes"
+      }
+    }
+  ]
+}
