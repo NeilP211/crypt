@@ -1,0 +1,41 @@
+# OpenTelemetry Collector configuration.
+#
+# The collector acts as the observability hub: it scrapes the backend's
+# Prometheus metrics and accepts OTLP, re-exporting metrics for Prometheus to
+# scrape. The OTLP trace pipeline is wired and ready for span export.
+
+receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: crypt-server
+          scrape_interval: 15s
+          metrics_path: /metrics
+          static_configs:
+            - targets: ["server:8080"]
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus, otlp]
+      processors: [batch]
+      exporters: [prometheus]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]

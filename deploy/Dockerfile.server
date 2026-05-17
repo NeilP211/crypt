@@ -1,0 +1,21 @@
+# Multi-stage build for the Rust backend. Build context is the repo root.
+
+FROM rust:1.83-slim AS builder
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends protobuf-compiler pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY Cargo.toml Cargo.lock ./
+COPY crates ./crates
+# Migrations are embedded into the binary at compile time by sqlx::migrate!.
+RUN cargo build --release --bin crypt-server --bin build-index
+
+FROM debian:bookworm-slim
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=builder /app/target/release/crypt-server /usr/local/bin/crypt-server
+COPY --from=builder /app/target/release/build-index /usr/local/bin/build-index
+EXPOSE 8080 50051
+CMD ["crypt-server"]
