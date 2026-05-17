@@ -1,0 +1,14 @@
+[workspace]
+resolver = "2"
+members = ["crates/hnsw"]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+authors = ["Crypt contributors"]
+repository = "https://github.com/neilpatel/crypt"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
