@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package crypt;
+
+// Visual + geospatial search over abandoned and historic locations.
+service SearchService {
+  // Rank locations by a hybrid of vector similarity, geographic proximity,
+  // and metadata filters. The caller supplies a precomputed CLIP embedding.
+  rpc Search(SearchRequest) returns (SearchResponse);
+
+  // Liveness/readiness probe that also reports index size.
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// A WGS84 coordinate.
+message GeoPoint {
+  double lat = 1;
+  double lng = 2;
+}
+
+message SearchRequest {
+  // CLIP image embedding of the query photo.
+  repeated float embedding = 1;
+  // Optional search origin; when set, results are distance-ranked from here.
+  GeoPoint origin = 2;
+  // Optional radius filter in meters (0 = unbounded).
+  double radius_meters = 3;
+  // Optional metadata filters; empty list = no filter on that field.
+  repeated string era = 4;
+  repeated string structure_type = 5;
+  repeated string verified_status = 6;
+  // Maximum number of results to return.
+  uint32 limit = 7;
+}
+
+message LocationResult {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  GeoPoint point = 4;
+  string era = 5;
+  string structure_type = 6;
+  string verified_status = 7;
+  string image_url = 8;
+  // Component and combined scores, each in [0, 1].
+  double vector_score = 9;
+  double geo_score = 10;
+  double hybrid_score = 11;
+  // Great-circle distance from the request origin, meters (-1 if no origin).
+  double distance_meters = 12;
+}
+
+message SearchResponse {
+  repeated LocationResult results = 1;
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  uint64 indexed_vectors = 2;
+}
