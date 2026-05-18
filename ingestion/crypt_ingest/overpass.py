@@ -20,7 +20,7 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 
 # Overpass rejects requests with the default `python-requests` user agent
 # (HTTP 406), so identify the client explicitly.
-_USER_AGENT = "crypt-ingest/0.1 (+https://github.com/neilpatel/crypt)"
+_USER_AGENT = "crypt-ingest/0.1 (+https://github.com/NeilP211/crypt)"
 
 # A few ready-made bounding boxes (south, west, north, east) for the CLI.
 REGIONS: dict[str, tuple[float, float, float, float]] = {

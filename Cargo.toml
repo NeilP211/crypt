@@ -6,7 +6,7 @@ members = ["crates/hnsw", "crates/proto", "crates/server"]
 edition = "2021"
 license = "MIT"
 authors = ["Crypt contributors"]
-repository = "https://github.com/neilpatel/crypt"
+repository = "https://github.com/NeilP211/crypt"
 
 [profile.release]
 opt-level = 3

@@ -35,7 +35,7 @@ def _download(session: requests.Session, url: str, max_bytes: int = 8_000_000) -
         response = session.get(
             url,
             timeout=30,
-            headers={"User-Agent": "crypt-ingest/0.1 (+https://github.com/neilpatel/crypt)"},
+            headers={"User-Agent": "crypt-ingest/0.1 (+https://github.com/NeilP211/crypt)"},
         )
         response.raise_for_status()
     except requests.RequestException:

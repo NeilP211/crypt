@@ -8,7 +8,7 @@ Upload a photo of a place you like — get visually similar abandoned and
 historic locations near you, ranked by image similarity, distance, and
 metadata.
 
-[![CI](https://github.com/neilpatel/crypt/actions/workflows/ci.yml/badge.svg)](https://github.com/neilpatel/crypt/actions/workflows/ci.yml)
+[![CI](https://github.com/NeilP211/crypt/actions/workflows/ci.yml/badge.svg)](https://github.com/NeilP211/crypt/actions/workflows/ci.yml)
 &nbsp;·&nbsp; Rust · Next.js · PostGIS · CLIP · AWS
 
 </div>
