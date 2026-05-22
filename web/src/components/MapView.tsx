@@ -195,10 +195,9 @@ export function MapView({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: DARK_STYLE,
-      // Open framed on the whole dataset (US east coast → Europe) rather than
-      // a single city, so the geographic spread is visible immediately.
-      center: [-22, 47],
-      zoom: 2.6,
+      // Open framed on the continental US, where the dataset lives.
+      center: [-96, 38],
+      zoom: 3.3,
       attributionControl: { compact: true },
     });
     map.addControl(new maplibregl.NavigationControl({}), "top-right");
