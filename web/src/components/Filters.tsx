@@ -1,6 +1,7 @@
 "use client";
 
 import { CATEGORIES } from "./HauntedGraphics";
+import { InfoTip } from "./InfoTip";
 
 interface FiltersProps {
   categories: string[];
@@ -65,15 +66,23 @@ export function Filters({
         </p>
       </div>
 
-      <label className="flex items-center gap-2 border-t border-ink-700 pt-3 text-xs text-bone-300">
-        <input
-          type="checkbox"
-          checked={useLocation}
-          onChange={(e) => onUseLocationChange(e.target.checked)}
-          className="accent-teal"
-        />
-        Rank search by distance from my location
-      </label>
+      <div className="flex items-center gap-2 border-t border-ink-700 pt-3">
+        <label className="flex items-center gap-2 text-xs text-bone-300">
+          <input
+            type="checkbox"
+            checked={useLocation}
+            onChange={(e) => onUseLocationChange(e.target.checked)}
+            className="accent-teal"
+          />
+          Rank search by distance from my location
+        </label>
+        <InfoTip side="top">
+          When on, results are ranked partly by how close each place is to you
+          (your browser asks for your location once). When off, results are
+          ranked only by how well they match your photo. The radius below sets
+          how far still counts as near.
+        </InfoTip>
+      </div>
 
       {useLocation && (
         <label className="flex flex-col gap-1 text-xs text-bone-400">

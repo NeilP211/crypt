@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { InfoTip } from "./InfoTip";
 import { useAuth } from "@/lib/auth";
 
 export function Nav() {
@@ -46,6 +47,11 @@ export function Nav() {
 
         {!loading && !user && (
           <div className="ml-2 flex items-center gap-2">
+            <InfoTip align="right">
+              Searching and the map are free and need no account. Sign in only
+              to save places you find and to submit new haunted spots to the
+              map. Your saved places then follow you across devices.
+            </InfoTip>
             <NavLink href="/login">Sign in</NavLink>
             <Link
               href="/register"

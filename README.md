@@ -209,6 +209,13 @@ the map. I'm from NC, and the earliest version of Crypt was something I used to
 scout spots around home before opening it up to the rest of the country — the
 concentration is a fossil of how the project started.
 
+## Design
+
+The visual identity (the candle icon, the teal / crimson / gold palette, and
+the gothic type) is inspired by the **Crypt Candle**, an item from the game
+Albion Online. It set the haunted, dungeon-lit tone the rest of the interface
+follows.
+
 ## Notes
 
 The AWS Terraform in `infra/` is real and `terraform validate`-clean, but is
