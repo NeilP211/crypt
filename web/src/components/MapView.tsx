@@ -7,6 +7,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 
+import { titleCase } from "@/lib/format";
 import type { BoundingBox, Location, ScoredLocation } from "@/lib/types";
 
 // English place names (`name:en`) where available, else Latin transliteration,
@@ -116,8 +117,44 @@ interface MapViewProps {
 function ambientMarker(): HTMLElement {
   const el = document.createElement("div");
   el.className =
-    "h-2.5 w-2.5 rounded-full border border-ink-950 bg-bone-400/70 shadow";
+    "h-3 w-3 cursor-pointer rounded-full border border-ink-950 bg-teal/70 " +
+    "shadow transition hover:scale-150 hover:bg-teal";
   return el;
+}
+
+const STATUS_COLOR: Record<string, string> = {
+  verified: "#54d4ba",
+  demolished: "#e0455a",
+  unverified: "#9a9285",
+};
+
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ] as string,
+  );
+}
+
+/** Info card shown in a marker's popup: image, name, type/era, status. */
+function locationPopupHTML(loc: Location): string {
+  const image = loc.image_url
+    ? `<img src="${escapeHtml(loc.image_url)}" alt="" style="width:100%;height:96px;` +
+      `object-fit:cover;border-radius:4px;margin-bottom:6px" />`
+    : "";
+  const color = STATUS_COLOR[loc.verified_status] ?? "#9a9285";
+  return (
+    `<div style="width:210px">${image}` +
+    `<div style="font-weight:600;color:#ece6da;font-size:13px;line-height:1.25">` +
+    `${escapeHtml(loc.name)}</div>` +
+    `<div style="color:#9a9285;font-size:11px;margin-top:3px">` +
+    `${escapeHtml(titleCase(loc.structure_type))} · ${escapeHtml(titleCase(loc.era))}</div>` +
+    `<div style="color:${color};font-size:10px;text-transform:uppercase;` +
+    `letter-spacing:.05em;margin-top:4px">${escapeHtml(loc.verified_status)}</div>` +
+    `</div>`
+  );
 }
 
 function resultMarker(rank: number, selected: boolean): HTMLElement {
@@ -198,8 +235,12 @@ export function MapView({
       if (resultIds.has(loc.id)) continue;
       const marker = new maplibregl.Marker({ element: ambientMarker() })
         .setLngLat([loc.lng, loc.lat])
+        .setPopup(
+          new maplibregl.Popup({ offset: 12, closeButton: true, maxWidth: "240px" }).setHTML(
+            locationPopupHTML(loc),
+          ),
+        )
         .addTo(map);
-      marker.getElement().addEventListener("click", () => onSelect?.(loc.id));
       markersRef.current.push(marker);
     }
 
@@ -209,8 +250,8 @@ export function MapView({
       const marker = new maplibregl.Marker({ element: el })
         .setLngLat([result.lng, result.lat])
         .setPopup(
-          new maplibregl.Popup({ offset: 18, closeButton: false }).setHTML(
-            `<strong>${result.name}</strong>`,
+          new maplibregl.Popup({ offset: 18, closeButton: true, maxWidth: "240px" }).setHTML(
+            locationPopupHTML(result),
           ),
         )
         .addTo(map);

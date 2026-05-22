@@ -24,6 +24,16 @@ body {
   display: none;
 }
 
+.maplibregl-popup-close-button {
+  @apply text-bone-400;
+  font-size: 16px;
+  padding: 0 6px;
+}
+
+.maplibregl-popup-close-button:hover {
+  @apply bg-transparent text-bone-200;
+}
+
 .maplibregl-ctrl-attrib.maplibregl-compact {
   @apply bg-ink-900/80 text-bone-400;
 }
