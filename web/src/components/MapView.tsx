@@ -218,8 +218,14 @@ export function MapView({
     });
     map.on("moveend", emitBbox);
 
+    // Keep the canvas matched to its container as the sidebar collapses or
+    // the window changes, not just on window resize events.
+    const resizeObserver = new ResizeObserver(() => map.resize());
+    resizeObserver.observe(containerRef.current);
+
     mapRef.current = map;
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       readyRef.current = false;

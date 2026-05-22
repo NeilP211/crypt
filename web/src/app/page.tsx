@@ -39,6 +39,7 @@ export default function HomePage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [useLocation, setUseLocation] = useState(false);
   const [radiusKm, setRadiusKm] = useState(50);
+  const [collapsed, setCollapsed] = useState(false);
 
   // Category filter applies to the ambient map dots (not the photo results).
   const visibleLocations = useMemo(
@@ -113,14 +114,32 @@ export default function HomePage() {
   );
 
   return (
-    <div className="flex h-full">
-      <aside className="flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-ink-700 bg-ink-950 p-4">
-        <div>
-          <h1 className="font-display text-xl text-crimson">Visual Search</h1>
-          <p className="mt-0.5 text-xs text-bone-400">
-            Drop a photo to uncover haunted places to urbex. These places will
-            resemble your photo by similarity, distance, and lore.
-          </p>
+    <div className="relative flex h-full overflow-hidden">
+      <aside
+        className={
+          "flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-ink-700 bg-ink-950 p-4 transition-[margin] duration-300 ease-in-out " +
+          (collapsed ? "-ml-[380px]" : "ml-0")
+        }
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h1 className="font-display text-xl text-crimson">Visual Search</h1>
+            <p className="mt-0.5 text-xs text-bone-400">
+              Drop a photo to uncover haunted places to urbex. These places will
+              resemble your photo by similarity, distance, and lore.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCollapsed(true)}
+            aria-label="Hide panel"
+            title="Hide panel"
+            className="-mr-1 mt-0.5 shrink-0 rounded-md border border-ink-700 p-1.5 text-bone-400 transition hover:border-teal hover:text-teal-bright"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
         </div>
 
         <NameSearch onPick={pickFromSearch} />
@@ -169,6 +188,26 @@ export default function HomePage() {
           selectedId={selectedId}
         />
       </div>
+
+      <button
+        type="button"
+        onClick={() => setCollapsed(false)}
+        aria-label="Show panel"
+        title="Show search panel"
+        className={
+          "absolute left-0 top-4 z-20 flex flex-col items-center gap-2 rounded-r-lg border border-l-0 border-ink-700 bg-ink-900/95 py-3 pl-1.5 pr-2 text-teal-bright shadow-lg backdrop-blur transition-all duration-300 ease-in-out hover:bg-ink-800 " +
+          (collapsed
+            ? "translate-x-0 opacity-100"
+            : "pointer-events-none -translate-x-full opacity-0")
+        }
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 6l6 6-6 6" />
+        </svg>
+        <span className="font-display text-xs tracking-wider [writing-mode:vertical-rl]">
+          Search
+        </span>
+      </button>
 
       <LocationDetail
         location={detail}
