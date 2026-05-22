@@ -1,5 +1,8 @@
-// Procedural spooky audio via the Web Audio API: a low ambient drone plus a
-// short synthesized tone per category when a place is opened. No audio files,
+// Procedural spooky audio via the Web Audio API. A low ambient drone, plus
+// soft wistful piano-like notes drawn from a minor pentatonic scale, evoking
+// the lonely cave-ambience mood of Minecraft's soundtrack (the real tracks are
+// copyrighted, so this is a synthesized homage rather than the music itself).
+// A short tone also plays per category when a place is opened. No audio files,
 // so nothing to host or license. The AudioContext is created lazily inside a
 // user gesture (the sound toggle), per browser autoplay policy.
 
@@ -27,10 +30,15 @@ const VOICES: Record<string, Voice> = {
 
 const DEFAULT_VOICE: Voice = { freqs: [220, 277], type: "sine", dur: 0.8, gap: 0 };
 
+// A minor pentatonic spread across a couple of octaves: the wistful palette
+// that reads as lonely-cave music.
+const MELODY = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
+
 class SpookyAudio {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null; // drone level
   private droneStarted = false;
+  private melodyTimer: ReturnType<typeof setTimeout> | null = null;
   enabled = false;
 
   private ensure() {
@@ -67,10 +75,15 @@ class SpookyAudio {
     master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), ctx.currentTime);
     master.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 1.5);
     this.enabled = true;
+    this.startMelody();
   }
 
   disable() {
     this.enabled = false;
+    if (this.melodyTimer) {
+      clearTimeout(this.melodyTimer);
+      this.melodyTimer = null;
+    }
     if (!this.ctx || !this.master) return;
     const ctx = this.ctx;
     this.master.gain.cancelScheduledValues(ctx.currentTime);
@@ -109,6 +122,55 @@ class SpookyAudio {
     lfo.start();
 
     this.droneStarted = true;
+  }
+
+  private startMelody() {
+    if (this.melodyTimer) return;
+    const loop = () => {
+      if (!this.enabled || !this.ctx) {
+        this.melodyTimer = null;
+        return;
+      }
+      this.playNote(MELODY[Math.floor(Math.random() * MELODY.length)]);
+      // Now and then answer with a second note, like a slow phrase.
+      if (Math.random() < 0.4) {
+        const next = MELODY[Math.floor(Math.random() * MELODY.length)];
+        setTimeout(() => this.playNote(next), 520);
+      }
+      this.melodyTimer = setTimeout(loop, 2600 + Math.random() * 3800);
+    };
+    this.melodyTimer = setTimeout(loop, 800);
+  }
+
+  private playNote(freq: number) {
+    if (!this.enabled || !this.ctx) return;
+    const ctx = this.ctx;
+    const t0 = ctx.currentTime;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 1800;
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, t0);
+    env.gain.exponentialRampToValueAtTime(0.12, t0 + 0.06);
+    env.gain.exponentialRampToValueAtTime(0.0001, t0 + 2.6);
+    lp.connect(env);
+    env.connect(ctx.destination);
+    // Fundamental plus a soft octave for a music-box shimmer.
+    const voices: { f: number; type: OscillatorType; amp: number }[] = [
+      { f: freq, type: "sine", amp: 1 },
+      { f: freq * 2, type: "triangle", amp: 0.32 },
+    ];
+    voices.forEach(({ f, type, amp }) => {
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.value = amp;
+      osc.connect(g);
+      g.connect(lp);
+      osc.start(t0);
+      osc.stop(t0 + 2.7);
+    });
   }
 
   playCategory(category: string) {

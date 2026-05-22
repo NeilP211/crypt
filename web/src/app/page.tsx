@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { BetaCard } from "@/components/BetaCard";
 import { Filters } from "@/components/Filters";
 import { categoryOf } from "@/components/HauntedGraphics";
 import { LocationDetail, type DetailInfo } from "@/components/LocationDetail";
@@ -154,6 +155,8 @@ export default function HomePage() {
           selectedId={selectedId}
           onOpen={openDetail}
         />
+
+        <BetaCard />
       </aside>
 
       <div className="relative flex-1">
