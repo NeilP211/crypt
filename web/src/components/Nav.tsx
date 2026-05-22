@@ -27,7 +27,7 @@ export function Nav() {
       </Link>
 
       <nav className="flex items-center gap-1 text-sm">
-        <NavLink href="/">Search</NavLink>
+        <NavLink href="/">Map</NavLink>
         {user && <NavLink href="/saved">Saved</NavLink>}
         {user && <NavLink href="/contribute">Contribute</NavLink>}
 

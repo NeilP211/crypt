@@ -1,9 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { CategoryGraphic } from "./HauntedGraphics";
 import { formatDistance, titleCase } from "@/lib/format";
+
+function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="rounded border border-ink-600 px-2 py-1 text-bone-300 transition hover:border-teal hover:text-teal-bright"
+    >
+      {children}
+    </a>
+  );
+}
 
 export interface DetailInfo {
   name: string;
@@ -104,6 +117,29 @@ export function LocationDetail({ location, onClose, onShowOnMap }: LocationDetai
               <span className="italic text-bone-400">No account recorded for this place.</span>
             )}
           </p>
+
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+            <p className="w-full font-mono text-[10px] uppercase tracking-wider text-bone-400">
+              Dig deeper
+            </p>
+            <ExternalLink
+              href={`https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(location.name)}`}
+            >
+              Wikipedia
+            </ExternalLink>
+            <ExternalLink
+              href={`https://www.google.com/search?q=${encodeURIComponent(`${location.name} haunted`)}`}
+            >
+              Web search
+            </ExternalLink>
+            {location.lat != null && location.lng != null && (
+              <ExternalLink
+                href={`https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`}
+              >
+                Street view
+              </ExternalLink>
+            )}
+          </div>
 
           <div className="mt-4 flex items-center justify-between border-t border-ink-700 pt-3 font-mono text-[11px] text-bone-400">
             <span>
