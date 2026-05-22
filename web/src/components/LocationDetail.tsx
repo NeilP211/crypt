@@ -80,7 +80,7 @@ export function LocationDetail({ location, onClose, onShowOnMap }: LocationDetai
               className="h-full w-full object-cover"
             />
           ) : (
-            <CategoryGraphic structureType={location.structure_type} />
+            <CategoryGraphic name={location.name} structureType={location.structure_type} />
           )}
         </div>
 

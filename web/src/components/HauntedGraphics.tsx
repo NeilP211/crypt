@@ -183,20 +183,175 @@ function Graveyard() {
   );
 }
 
+function School() {
+  return (
+    <g>
+      <rect x="74" y="86" width="92" height="44" fill={DARK} />
+      <polygon points="104,74 120,62 136,74" fill={DARK} />
+      <rect x="106" y="74" width="28" height="12" fill={DARK} />
+      {[110, 118, 126].map((x) => (
+        <rect key={x} x={x} y="86" width="3" height="44" fill="#0a090b" />
+      ))}
+      <rect x="116" y="108" width="8" height="22" fill={DARK} />
+      {[0, 1].map((row) =>
+        [80, 92, 140, 152].map((x) => (
+          <rect key={`${row}-${x}`} x={x} y={92 + row * 16} width="7" height="9" fill={GLOW} opacity="0.8" />
+        )),
+      )}
+      <line x1="120" y1="62" x2="120" y2="50" stroke={DARK} strokeWidth="2" />
+      <polygon points="120,50 130,53 120,56" fill={MOON} />
+    </g>
+  );
+}
+
+function Theater() {
+  return (
+    <g>
+      <rect x="80" y="78" width="80" height="52" fill={DARK} />
+      <rect x="76" y="96" width="88" height="9" fill={DARK} />
+      {[84, 96, 108, 132, 144, 156].map((x) => (
+        <circle key={x} cx={x} cy="100.5" r="2" fill={GLOW_BRIGHT} />
+      ))}
+      <rect x="114" y="50" width="12" height="28" fill={DARK} />
+      <rect x="116" y="54" width="8" height="20" fill={GLOW} opacity="0.6" />
+      <path d="M112,130 L112,112 Q120,104 128,112 L128,130 Z" fill="#0a090b" />
+    </g>
+  );
+}
+
+function Hotel() {
+  return (
+    <g>
+      <rect x="94" y="52" width="50" height="78" fill={DARK} />
+      {[0, 1, 2, 3].map((r) =>
+        [98, 108, 118, 128].map((x) => (
+          <rect key={`${r}-${x}`} x={x} y={58 + r * 14} width="6" height="8" fill={GLOW} opacity="0.7" />
+        )),
+      )}
+      <rect x="90" y="118" width="58" height="6" fill={DARK} />
+      <rect x="144" y="56" width="7" height="40" fill={DARK} />
+      <rect x="146" y="60" width="3" height="32" fill={MOON} />
+      <rect x="112" y="118" width="14" height="12" fill="#0a090b" />
+    </g>
+  );
+}
+
+function Bridge() {
+  return (
+    <g stroke={DARK} strokeWidth="2.5" fill="none">
+      <line x1="46" y1="106" x2="194" y2="106" />
+      <line x1="60" y1="86" x2="180" y2="86" />
+      <line x1="60" y1="86" x2="60" y2="106" />
+      <line x1="180" y1="86" x2="180" y2="106" />
+      <path d="M60,86 L84,106 L108,86 L132,106 L156,86 L180,106" />
+      <path d="M60,106 L84,86 L108,106 L132,86 L156,106 L180,86" />
+    </g>
+  );
+}
+
+function Lighthouse() {
+  return (
+    <g>
+      <polygon points="125,53 162,44 162,62" fill={GLOW} opacity="0.18" />
+      <polygon points="115,53 78,44 78,62" fill={GLOW} opacity="0.18" />
+      <polygon points="110,128 116,58 124,58 130,128" fill={DARK} />
+      <rect x="112" y="78" width="16" height="5" fill={MOON} opacity="0.75" />
+      <rect x="110" y="100" width="20" height="5" fill={MOON} opacity="0.75" />
+      <rect x="113" y="48" width="14" height="10" fill={DARK} />
+      <polygon points="111,48 129,48 120,40" fill={DARK} />
+      <rect x="115" y="50" width="10" height="7" fill={GLOW_BRIGHT} />
+      <path d="M96,130 Q120,120 144,130 Z" fill={DARK} />
+    </g>
+  );
+}
+
+function Jail() {
+  return (
+    <g>
+      <rect x="80" y="82" width="100" height="48" fill={DARK} />
+      {[88, 118, 148].map((x) => (
+        <g key={x}>
+          <rect x={x} y="92" width="14" height="16" fill={GLOW} opacity="0.55" />
+          {[0, 1, 2].map((b) => (
+            <rect key={b} x={x + 3 + b * 4} y="92" width="1.5" height="16" fill={DARK} />
+          ))}
+        </g>
+      ))}
+      <rect x="120" y="64" width="18" height="18" fill={DARK} />
+      <rect x="124" y="68" width="10" height="10" fill={GLOW} opacity="0.6" />
+      <rect x="122" y="112" width="16" height="18" fill="#0a090b" />
+    </g>
+  );
+}
+
 const GRAPHICS: Record<string, () => JSX.Element> = {
-  religious: Church,
-  rail: Train,
-  factory: Factory,
+  graveyard: Graveyard,
+  church: Church,
+  school: School,
   hospital: Asylum,
-  castle: Castle,
+  theater: Theater,
+  hotel: Hotel,
+  bridge: Bridge,
+  lighthouse: Lighthouse,
+  jail: Jail,
+  factory: Factory,
   mine: Mine,
+  rail: Train,
+  castle: Castle,
   military: Bunker,
+  house: House,
   ruins: Ruins,
-  residential: House,
 };
 
-export function CategoryGraphic({ structureType }: { structureType: string }) {
-  const Shape = GRAPHICS[structureType] ?? Graveyard;
+// Ordered name keywords → graphic. The location *name* is far more specific
+// than the coarse structure_type, so we classify from it first.
+const NAME_RULES: [RegExp, string][] = [
+  [/cemeter|graveyard|burial|\bgrave|tomb|\bcrypt|mausoleum/i, "graveyard"],
+  [/jail|prison|penitentiar|reformatory|\bgaol|correctional/i, "jail"],
+  [/hospital|asylum|sanator|sanitar|infirmary|insane|psychiatric/i, "hospital"],
+  [/church|chapel|cathedral|abbey|monaster|convent|shrine|parish|temple|cemetery chapel/i, "church"],
+  [/school|academ|college|universit|institute|seminary|dormitor/i, "school"],
+  [/theat(?:er|re)|opera|playhouse|cinema|auditorium|amphitheat/i, "theater"],
+  [/hotel|motel|\binn\b|tavern|saloon|\blodge|boarding|brothel/i, "hotel"],
+  [/bridge|viaduct|trestle|overpass/i, "bridge"],
+  [/lighthouse|light\s?station/i, "lighthouse"],
+  [/mill|factory|works|foundr|furnace|refinery|\bplant\b|warehouse|brewery|distiller/i, "factory"],
+  [/\bmine\b|colliery|quarry|mineshaft/i, "mine"],
+  [/rail|train|depot|\bstation\b|locomotive|roundhouse|\bdepot/i, "rail"],
+  [/bunker|arsenal|armory|battery|\bbase\b|barracks|military|naval|air\s?force/i, "military"],
+  [/castle|fort\b|fortress|citadel|garrison|tower/i, "castle"],
+  [/house|mansion|manor|estate|\bhome\b|residence|plantation|cabin|farmhouse|cottage|villa/i, "house"],
+  [/ruin/i, "ruins"],
+];
+
+const STRUCT_FALLBACK: Record<string, string> = {
+  religious: "church",
+  rail: "rail",
+  factory: "factory",
+  hospital: "hospital",
+  castle: "castle",
+  mine: "mine",
+  military: "military",
+  residential: "house",
+  ruins: "ruins",
+};
+
+function pickGraphic(name: string, structureType: string): () => JSX.Element {
+  for (const [re, key] of NAME_RULES) {
+    if (re.test(name)) return GRAPHICS[key];
+  }
+  const fallback = STRUCT_FALLBACK[structureType];
+  return (fallback && GRAPHICS[fallback]) || Graveyard;
+}
+
+export function CategoryGraphic({
+  name,
+  structureType,
+}: {
+  name: string;
+  structureType: string;
+}) {
+  const Shape = pickGraphic(name ?? "", structureType ?? "");
   return (
     <Frame>
       <Shape />

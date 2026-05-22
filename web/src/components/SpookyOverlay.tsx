@@ -1,7 +1,11 @@
-// Faint apparitions — ghosts, bats, and a witch — drifting across the
-// viewport for atmosphere. Pointer-events-none so it never blocks the UI, and
-// it hides itself for users who prefer reduced motion (see globals.css).
+"use client";
 
+// Faint apparitions — ghosts, bats, and a witch — drifting across the
+// viewport. They scurry away from the cursor when it gets close. The overlay
+// is pointer-events-none so it never blocks the UI, and it hides itself for
+// users who prefer reduced motion (see globals.css).
+
+import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 
 function Ghost() {
@@ -58,12 +62,60 @@ const SPOOKS: Spook[] = [
   { el: <Bat />, top: "46%", drift: "right", duration: 16, delay: 9, opacity: 0.28, bob: 2.5 },
 ];
 
+const REPEL_RADIUS = 130; // px
+const REPEL_STRENGTH = 110; // px max push
+
 export function SpookyOverlay() {
+  const repelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const mouse = useRef<{ x: number; y: number } | null>(null);
+  const offsets = useRef(SPOOKS.map(() => ({ x: 0, y: 0 })));
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      mouse.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("mousemove", onMove);
+
+    let raf = 0;
+    const tick = () => {
+      const m = mouse.current;
+      repelRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const off = offsets.current[i];
+        let tx = 0;
+        let ty = 0;
+        if (m) {
+          const rect = el.getBoundingClientRect();
+          // Center without the current repulsion offset, so it settles.
+          const cx = rect.left + rect.width / 2 - off.x;
+          const cy = rect.top + rect.height / 2 - off.y;
+          const dx = cx - m.x;
+          const dy = cy - m.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < REPEL_RADIUS && dist > 0.01) {
+            const force = (1 - dist / REPEL_RADIUS) * REPEL_STRENGTH;
+            tx = (dx / dist) * force;
+            ty = (dy / dist) * force;
+          }
+        }
+        // Quick to flee, slow to drift back.
+        const ease = tx || ty ? 0.3 : 0.08;
+        off.x += (tx - off.x) * ease;
+        off.y += (ty - off.y) * ease;
+        el.style.transform = `translate(${off.x.toFixed(1)}px, ${off.y.toFixed(1)}px)`;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-30 overflow-hidden"
-    >
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
       {SPOOKS.map((s, i) => {
         const outer: CSSProperties = {
           top: s.top,
@@ -75,7 +127,13 @@ export function SpookyOverlay() {
           : {};
         return (
           <div key={i} className="spook" style={outer}>
-            <div style={inner}>{s.el}</div>
+            <div
+              ref={(el) => {
+                repelRefs.current[i] = el;
+              }}
+            >
+              <div style={inner}>{s.el}</div>
+            </div>
           </div>
         );
       })}
