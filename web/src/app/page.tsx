@@ -104,8 +104,8 @@ export default function HomePage() {
         <div>
           <h1 className="font-display text-xl text-crimson">Visual Search</h1>
           <p className="mt-0.5 text-xs text-bone-400">
-            Drop a photo to uncover haunted and abandoned places that resemble
-            it — ranked by visual similarity, distance, and lore.
+            Drop a photo to uncover haunted places to urbex. These places will
+            resemble your photo by similarity, distance, and lore.
           </p>
         </div>
 
