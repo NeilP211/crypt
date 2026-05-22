@@ -37,8 +37,8 @@ export function UploadDropzone({ onFile, disabled }: UploadDropzoneProps) {
         (disabled
           ? "cursor-not-allowed border-ink-700 opacity-50"
           : dragging
-            ? "border-gold bg-gold/10"
-            : "border-ink-600 hover:border-gold/60 hover:bg-ink-800")
+            ? "border-teal bg-teal/10"
+            : "border-ink-600 hover:border-teal/60 hover:bg-ink-800")
       }
     >
       <input

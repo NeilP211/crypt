@@ -49,7 +49,7 @@ function ChipGroup({
               className={
                 "rounded-full border px-2.5 py-1 text-[11px] transition " +
                 (active
-                  ? "border-gold bg-gold/15 text-gold-bright"
+                  ? "border-teal bg-teal/15 text-teal-bright"
                   : "border-ink-600 text-bone-400 hover:border-bone-400")
               }
             >
@@ -100,7 +100,7 @@ export function Filters({
           type="checkbox"
           checked={useLocation}
           onChange={(e) => onUseLocationChange(e.target.checked)}
-          className="accent-gold"
+          className="accent-teal"
         />
         Rank by distance from my location
       </label>
@@ -114,7 +114,7 @@ export function Filters({
             max={500}
             value={radiusKm}
             onChange={(e) => onRadiusChange(Number(e.target.value))}
-            className="accent-gold"
+            className="accent-teal"
           />
         </label>
       )}

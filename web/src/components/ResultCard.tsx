@@ -54,7 +54,7 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
       className={
         "flex cursor-pointer gap-3 rounded-lg border p-3 transition " +
         (selected
-          ? "border-gold bg-ink-800"
+          ? "border-teal bg-ink-800"
           : "border-ink-700 bg-ink-900 hover:border-ink-600")
       }
     >
@@ -70,7 +70,7 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
             no image
           </div>
         )}
-        <span className="absolute left-0 top-0 flex h-5 w-5 items-center justify-center bg-gold text-xs font-bold text-ink-950">
+        <span className="absolute left-0 top-0 flex h-5 w-5 items-center justify-center bg-crimson text-xs font-bold text-bone-200">
           {rank}
         </span>
       </div>
@@ -131,8 +131,8 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
             className={
               "rounded border px-2 py-0.5 text-[11px] transition disabled:opacity-50 " +
               (saved
-                ? "border-gold bg-gold/15 text-gold-bright"
-                : "border-ink-600 text-bone-300 hover:border-gold")
+                ? "border-teal bg-teal/15 text-teal-bright"
+                : "border-ink-600 text-bone-300 hover:border-teal")
             }
           >
             {saved ? "Saved" : "Save"}

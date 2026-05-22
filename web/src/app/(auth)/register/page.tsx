@@ -53,7 +53,7 @@ export default function RegisterPage() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-teal"
         />
       </label>
 
@@ -63,7 +63,7 @@ export default function RegisterPage() {
           type="text"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-teal"
         />
       </label>
 
@@ -74,7 +74,7 @@ export default function RegisterPage() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-teal"
         />
         <span className="mt-1 block text-[10px] text-bone-400">
           at least 8 characters
@@ -86,14 +86,14 @@ export default function RegisterPage() {
       <button
         type="submit"
         disabled={busy}
-        className="mt-4 w-full rounded bg-gold py-2 text-sm font-medium text-ink-950 transition hover:bg-gold-bright disabled:opacity-50"
+        className="mt-4 w-full rounded bg-teal py-2 text-sm font-medium text-ink-950 transition hover:bg-teal-bright disabled:opacity-50"
       >
         {busy ? "Creating…" : "Create account"}
       </button>
 
       <p className="mt-3 text-center text-xs text-bone-400">
         Already registered?{" "}
-        <Link href="/login" className="text-gold hover:text-gold-bright">
+        <Link href="/login" className="text-teal hover:text-teal-bright">
           Sign in
         </Link>
       </p>

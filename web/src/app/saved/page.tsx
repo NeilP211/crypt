@@ -33,7 +33,7 @@ export default function SavedPage() {
     return (
       <Centered>
         <p className="text-sm text-bone-400">
-          <Link href="/login" className="text-gold hover:text-gold-bright">
+          <Link href="/login" className="text-teal hover:text-teal-bright">
             Sign in
           </Link>{" "}
           to see your saved locations.

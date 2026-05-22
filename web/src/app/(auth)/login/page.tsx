@@ -46,7 +46,7 @@ export default function LoginPage() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-teal"
         />
       </label>
 
@@ -57,7 +57,7 @@ export default function LoginPage() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-teal"
         />
       </label>
 
@@ -66,14 +66,14 @@ export default function LoginPage() {
       <button
         type="submit"
         disabled={busy}
-        className="mt-4 w-full rounded bg-gold py-2 text-sm font-medium text-ink-950 transition hover:bg-gold-bright disabled:opacity-50"
+        className="mt-4 w-full rounded bg-teal py-2 text-sm font-medium text-ink-950 transition hover:bg-teal-bright disabled:opacity-50"
       >
         {busy ? "Signing in…" : "Sign in"}
       </button>
 
       <p className="mt-3 text-center text-xs text-bone-400">
         No account?{" "}
-        <Link href="/register" className="text-gold hover:text-gold-bright">
+        <Link href="/register" className="text-teal hover:text-teal-bright">
           Register
         </Link>
       </p>

@@ -51,8 +51,8 @@ function resultMarker(rank: number, selected: boolean): HTMLElement {
     "flex h-7 w-7 cursor-pointer items-center justify-center rounded-full " +
     "border-2 text-xs font-bold shadow-lg transition " +
     (selected
-      ? "border-gold-bright bg-gold-bright text-ink-950 scale-125"
-      : "border-ink-950 bg-gold text-ink-950 hover:scale-110");
+      ? "border-crimson bg-crimson text-bone-200 scale-125"
+      : "border-ink-950 bg-teal text-ink-950 hover:scale-110");
   return el;
 }
 

@@ -73,7 +73,7 @@ export default function ContributePage() {
     return (
       <Centered>
         <p className="text-sm text-bone-400">
-          <Link href="/login" className="text-gold hover:text-gold-bright">
+          <Link href="/login" className="text-teal hover:text-teal-bright">
             Sign in
           </Link>{" "}
           to contribute a location.
@@ -83,7 +83,7 @@ export default function ContributePage() {
   }
 
   const field =
-    "mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold";
+    "mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-teal";
 
   return (
     <div className="mx-auto h-full max-w-2xl overflow-y-auto p-6">
@@ -189,7 +189,7 @@ export default function ContributePage() {
         <button
           type="submit"
           disabled={busy}
-          className="rounded bg-gold py-2 text-sm font-medium text-ink-950 transition hover:bg-gold-bright disabled:opacity-50"
+          className="rounded bg-teal py-2 text-sm font-medium text-ink-950 transition hover:bg-teal-bright disabled:opacity-50"
         >
           {busy ? "Submitting…" : "Submit for review"}
         </button>

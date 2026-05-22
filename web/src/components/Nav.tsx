@@ -16,7 +16,7 @@ export function Nav() {
           className="h-8 w-8 rounded-md shadow-glow"
         />
         <span className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-bold tracking-[0.3em] text-gold">
+          <span className="font-display text-lg font-bold tracking-[0.3em] text-teal">
             CRYPT
           </span>
           <span className="hidden text-xs text-bone-400 sm:inline">
@@ -37,7 +37,7 @@ export function Nav() {
             </span>
             <button
               onClick={logout}
-              className="rounded border border-ink-600 px-2.5 py-1 text-xs text-bone-300 transition hover:border-gold hover:text-gold-bright"
+              className="rounded border border-ink-600 px-2.5 py-1 text-xs text-bone-300 transition hover:border-teal hover:text-teal-bright"
             >
               Sign out
             </button>
@@ -49,7 +49,7 @@ export function Nav() {
             <NavLink href="/login">Sign in</NavLink>
             <Link
               href="/register"
-              className="rounded bg-gold px-3 py-1.5 text-xs font-medium text-ink-950 transition hover:bg-gold-bright"
+              className="rounded bg-teal px-3 py-1.5 text-xs font-medium text-ink-950 transition hover:bg-teal-bright"
             >
               Register
             </Link>
