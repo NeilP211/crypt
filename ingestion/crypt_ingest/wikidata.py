@@ -141,18 +141,22 @@ SELECT ?item ?itemLabel ?lat ?lon ?image WHERE {{
     return parse_bindings(_query(sparql))
 
 
-# North Carolina bounding box (south, west, north, east); the west/south
-# edges are kept just inside the state line to exclude Atlanta.
-NORTH_CAROLINA_BBOX = (33.85, -84.1, 36.6, -75.4)
-
-
-def _in_north_carolina(loc: RawLocation) -> bool:
-    """Keep points on the NC side of the diagonal state line: the bbox's SW
-    corner otherwise clips metro Atlanta and upstate South Carolina."""
-    return loc.lat >= 35.0 or loc.lng >= -80.5
+# Wikidata QID for the U.S. state of North Carolina.
+NORTH_CAROLINA_QID = "Q1454"
 
 
 def fetch_north_carolina(limit: int = 250) -> list[RawLocation]:
-    """Image-backed historic structures in North Carolina."""
-    candidates = fetch_in_bbox(*NORTH_CAROLINA_BBOX, limit=limit)
-    return [loc for loc in candidates if _in_north_carolina(loc)]
+    """Image-backed places located in North Carolina.
+
+    Uses the transitive ``located in the administrative territorial entity``
+    relation (P131*), which is accurate to the state line — unlike a bounding
+    box, whose SW corner clips metro Atlanta and upstate South Carolina.
+    """
+    sparql = f"""
+SELECT ?item ?itemLabel ?lat ?lon ?image WHERE {{
+  ?item wdt:P131* wd:{NORTH_CAROLINA_QID} ; wdt:P18 ?image ; p:P625 ?st .
+  ?st psv:P625 ?cv . ?cv wikibase:geoLatitude ?lat ; wikibase:geoLongitude ?lon .
+  ?item rdfs:label ?itemLabel . FILTER(LANG(?itemLabel) = "en")
+}} LIMIT {int(limit)}
+"""
+    return parse_bindings(_query(sparql))
