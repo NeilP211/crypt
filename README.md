@@ -22,8 +22,8 @@ country, ranked by visual similarity, distance, and lore.
 
 ## Why
 
-Discovery for haunted spots and urban-exploration sites is gatekept —
-scattered across private forums, Discord servers, and word of mouth — and the
+Discovery for haunted spots and urban-exploration sites is gatekept,
+scattered across private forums, Discord servers, and word of mouth, and the
 tooling that exists is poor. Crypt is the search engine I wanted: point it at
 a photo and it surfaces the eerily similar places, with location, type, and
 the story behind each one.
@@ -33,10 +33,10 @@ the story behind each one.
 A full search platform built around a **vector index written from scratch in
 Rust**. The pieces:
 
-- A custom **HNSW** approximate-nearest-neighbor index — the hero component —
+- A custom **HNSW** approximate-nearest-neighbor index, the hero component,
   benchmarked against exact kNN.
 - **CLIP** embeddings over thousands of haunted/abandoned locations. CLIP is
-  multimodal — image and text share one embedding space — so the index can be
+  multimodal (image and text share one embedding space), so the index can be
   built from location *descriptions* and still answer *photo* queries.
 - A **PostGIS** geospatial layer for radius, bounding-box, and distance
   queries.
@@ -65,7 +65,7 @@ scored results in the sidebar, blending visual similarity, distance, and lore.
 |---|---|
 | **Custom HNSW index** | recall@10 **97.2%** vs. exact kNN at **100k** vectors |
 | **vs. FAISS** | within **1.2 pp** of FAISS HNSW at matched parameters |
-| **Query latency** | **P99 4.9 ms** at 100k vectors — far under the 20 ms target |
+| **Query latency** | **P99 4.9 ms** at 100k vectors, far under the 20 ms target |
 | **Transports** | REST + gRPC over one shared search core |
 | **Ranking** | hybrid vector + geospatial + metadata scoring |
 | **Runs locally** | `docker compose up` boots the entire stack |
@@ -120,7 +120,7 @@ than comparing two approximate libraries. At 100k clustered 128-d vectors
 | 512       | **97.2%** | 4.2 ms      | **4.9 ms**  |
 
 Against **FAISS HNSW** at identical parameters on the same data, the
-from-scratch index lands **within 1.2 percentage points** of recall —
+from-scratch index lands **within 1.2 percentage points** of recall, detailed in
 [`benchmarks/FAISS_COMPARISON.md`](benchmarks/FAISS_COMPARISON.md).
 
 The crate has property tests (retrievability, recall floor, persistence
@@ -132,14 +132,14 @@ round-trip), `criterion` micro-benchmarks, and a report generator.
 |-------|--------|
 | Vector index | Custom HNSW in **Rust** |
 | Embeddings | **CLIP** ViT-B/32 (`open_clip`) |
-| Backend | **Rust** — axum (REST) + tonic (gRPC), sqlx |
+| Backend | **Rust**: axum (REST) + tonic (gRPC), sqlx |
 | Database | **PostgreSQL + PostGIS** |
 | Cache | **Redis** |
-| Ingestion | **Python** — OpenStreetMap Overpass API |
+| Ingestion | **Python**: OpenStreetMap Overpass API |
 | Frontend | **Next.js** + TypeScript + **MapLibre GL JS** |
 | Auth | In-house JWT (Argon2id, access + refresh tokens) |
 | Observability | OpenTelemetry Collector · Prometheus · Grafana |
-| Infrastructure | **Terraform** — ECS Fargate, RDS, S3 + CloudFront |
+| Infrastructure | **Terraform**: ECS Fargate, RDS, S3 + CloudFront |
 | CI | GitHub Actions |
 
 ## Quickstart
@@ -210,7 +210,7 @@ Notable trade-offs are recorded as ADRs in [`docs/adr/`](docs/adr/):
 ## About the dataset
 
 Crypt is loaded from the **Shadowlands Haunted Places Index** (via the
-[Kaggle dataset](https://www.kaggle.com/datasets/sujaykapadnis/haunted-places)) —
+[Kaggle dataset](https://www.kaggle.com/datasets/sujaykapadnis/haunted-places)):
 ~11k reported haunted and abandoned US locations: asylums, cemeteries, old
 houses, ghost towns, mills, and ruins, each with coordinates and a written
 account of its haunting. The ingestion pipeline also supports OpenStreetMap and
@@ -219,14 +219,14 @@ Wikidata sources (`--wikidata`) for image-backed places worldwide.
 **Why a photo can search text.** The haunted dataset has descriptions, not
 photos. Because CLIP encodes images and text into the *same* embedding space,
 Crypt embeds each location's caption with CLIP's text encoder and your uploaded
-photo with its image encoder — and compares them directly. So "visual search"
+photo with its image encoder, and compares them directly. So "visual search"
 becomes "find places whose story matches what your photo looks like." The HNSW
 index, PostGIS layer, and hybrid ranking are all unchanged.
 
 **The North Carolina bias is intentional.** The ingest keeps every NC location
 and caps every other state (`--boost-state`), so NC is the densest cluster on
 the map. I'm from NC, and the earliest version of Crypt was something I used to
-scout spots around home before opening it up to the rest of the country — the
+scout spots around home before opening it up to the rest of the country. The
 concentration is a fossil of how the project started.
 
 ## Design
@@ -239,7 +239,7 @@ follows.
 ## Notes
 
 The AWS Terraform in `infra/` is real and `terraform validate`-clean, but is
-not applied by this project — deploying it needs an AWS account and incurs
+not applied by this project: deploying it needs an AWS account and incurs
 cost. Everything else runs locally with `docker compose`.
 
 ## License
