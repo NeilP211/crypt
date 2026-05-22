@@ -92,7 +92,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="also source from Wikidata: worldwide urbex sites + North Carolina",
     )
     parser.add_argument(
-        "--global-limit", type=int, default=150, help="max Wikidata worldwide sites"
+        "--global-limit", type=int, default=100, help="max Wikidata worldwide sites"
+    )
+    parser.add_argument(
+        "--us-limit", type=int, default=150, help="max Wikidata U.S. urbex sites"
     )
     parser.add_argument(
         "--nc-limit", type=int, default=250, help="max Wikidata North Carolina sites"
@@ -121,6 +124,8 @@ def main(argv: list[str] | None = None) -> int:
 
         print("querying Wikidata (worldwide urbex)...", file=sys.stderr)
         raw.extend(wikidata.fetch_global(args.global_limit))
+        print("querying Wikidata (U.S. urbex)...", file=sys.stderr)
+        raw.extend(wikidata.fetch_urbex_usa(args.us_limit))
         print("querying Wikidata (North Carolina)...", file=sys.stderr)
         raw.extend(wikidata.fetch_north_carolina(limit=args.nc_limit))
 

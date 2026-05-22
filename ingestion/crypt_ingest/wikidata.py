@@ -144,18 +144,68 @@ SELECT ?item ?itemLabel ?lat ?lon ?image WHERE {{
 # Wikidata QID for the U.S. state of North Carolina.
 NORTH_CAROLINA_QID = "Q1454"
 
+# Continental U.S. bounding box (south, west, north, east).
+USA_BBOX = (24.0, -125.0, 49.5, -66.0)
+
+# Types excluded from the "historic places" region query — active
+# institutions, retail, settlements, and natural features are not urbex.
+_EXCLUDED_TYPES = " ".join(
+    "wd:" + qid
+    for qid in (
+        "Q33506",   # museum
+        "Q31374",   # ... (theme park / attraction)
+        "Q11315",   # shopping center
+        "Q3914",    # school
+        "Q9826",    # high school
+        "Q3918",    # university
+        "Q16917",   # hospital
+        "Q24354",   # theater
+        "Q7075",    # library
+        "Q483110",  # stadium
+        "Q11707",   # restaurant
+        "Q22698",   # park
+        "Q515",     # city
+        "Q3957",    # town
+        "Q486972",  # human settlement
+        "Q8502",    # mountain
+        "Q4022",    # river
+        "Q23397",   # lake
+        "Q23442",   # island
+        "Q46831",   # mountain range
+    )
+)
+
+
+def fetch_urbex_usa(limit: int = 150) -> list[RawLocation]:
+    """Genuine urbex sites across the continental U.S. — ruins, ghost towns,
+    and archaeological sites — filtered by coordinate (fast)."""
+    south, west, north, east = USA_BBOX
+    types = " ".join(_GLOBAL_TYPES)
+    sparql = f"""
+SELECT ?item ?itemLabel ?lat ?lon ?image WHERE {{
+  VALUES ?type {{ {types} }}
+  ?item wdt:P31 ?type ; wdt:P18 ?image ; p:P625 ?st .
+  ?st psv:P625 ?cv . ?cv wikibase:geoLatitude ?lat ; wikibase:geoLongitude ?lon .
+  FILTER(?lat > {south} && ?lat < {north} && ?lon > {west} && ?lon < {east})
+  ?item rdfs:label ?itemLabel . FILTER(LANG(?itemLabel) = "en")
+}} LIMIT {int(limit)}
+"""
+    return parse_bindings(_query(sparql))
+
 
 def fetch_north_carolina(limit: int = 250) -> list[RawLocation]:
-    """Image-backed places located in North Carolina.
+    """Image-backed historic places in North Carolina.
 
-    Uses the transitive ``located in the administrative territorial entity``
-    relation (P131*), which is accurate to the state line — unlike a bounding
-    box, whose SW corner clips metro Atlanta and upstate South Carolina.
+    Uses the transitive ``located in`` relation (P131*), accurate to the state
+    line, and excludes active institutions, retail, settlements, and natural
+    features so the results read as historic/abandoned sites rather than
+    working museums, malls, or mountains.
     """
     sparql = f"""
 SELECT ?item ?itemLabel ?lat ?lon ?image WHERE {{
   ?item wdt:P131* wd:{NORTH_CAROLINA_QID} ; wdt:P18 ?image ; p:P625 ?st .
   ?st psv:P625 ?cv . ?cv wikibase:geoLatitude ?lat ; wikibase:geoLongitude ?lon .
+  FILTER NOT EXISTS {{ ?item wdt:P31 ?bad . VALUES ?bad {{ {_EXCLUDED_TYPES} }} }}
   ?item rdfs:label ?itemLabel . FILTER(LANG(?itemLabel) = "en")
 }} LIMIT {int(limit)}
 """
