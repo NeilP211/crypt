@@ -125,6 +125,31 @@ pub async fn fetch_in_bbox(
         .await
 }
 
+/// Find locations whose name matches a free-text query, case-insensitively.
+/// Backs the sidebar name search, which spans the whole index rather than the
+/// current map viewport.
+pub async fn search_by_name(
+    pool: &PgPool,
+    query: &str,
+    limit: i64,
+) -> Result<Vec<Location>, sqlx::Error> {
+    let pattern = format!("%{}%", query);
+    let sql = format!(
+        r#"
+        SELECT {LOCATION_COLUMNS}
+        FROM locations
+        WHERE name ILIKE $1
+        ORDER BY name
+        LIMIT $2
+        "#
+    );
+    sqlx::query_as::<_, Location>(&sql)
+        .bind(pattern)
+        .bind(limit)
+        .fetch_all(pool)
+        .await
+}
+
 /// Total number of indexed locations.
 pub async fn count(pool: &PgPool) -> Result<i64, sqlx::Error> {
     let row: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM locations")

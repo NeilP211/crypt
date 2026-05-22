@@ -6,6 +6,7 @@ import { Filters } from "@/components/Filters";
 import { categoryOf } from "@/components/HauntedGraphics";
 import { LocationDetail, type DetailInfo } from "@/components/LocationDetail";
 import { MapView } from "@/components/MapView";
+import { NameSearch } from "@/components/NameSearch";
 import { ResultList } from "@/components/ResultList";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { api, ApiError } from "@/lib/api";
@@ -100,6 +101,16 @@ export default function HomePage() {
     setDetail(null);
   }, []);
 
+  const pickFromSearch = useCallback(
+    (loc: Location) => {
+      if (loc.lat != null && loc.lng != null) {
+        setFocus({ lat: loc.lat, lng: loc.lng });
+      }
+      openDetail(loc);
+    },
+    [openDetail],
+  );
+
   return (
     <div className="flex h-full">
       <aside className="flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-ink-700 bg-ink-950 p-4">
@@ -110,6 +121,8 @@ export default function HomePage() {
             resemble your photo by similarity, distance, and lore.
           </p>
         </div>
+
+        <NameSearch onPick={pickFromSearch} />
 
         <UploadDropzone onFile={runSearch} disabled={loading} />
 

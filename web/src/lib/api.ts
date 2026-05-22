@@ -116,6 +116,12 @@ export const api = {
 
   location: (id: string) => request<Location>(`/api/locations/${id}`),
 
+  /** Find locations by name across the whole index, not just the viewport. */
+  searchByName: (query: string, limit = 12) =>
+    request<Location[]>(
+      `/api/locations/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+    ),
+
   savedLocations: (token: string) =>
     request<Location[]>("/api/saved", {}, token),
 

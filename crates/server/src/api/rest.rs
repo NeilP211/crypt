@@ -94,6 +94,13 @@ struct BboxQuery {
 }
 
 #[derive(Deserialize)]
+struct NameSearchQuery {
+    q: String,
+    #[serde(default)]
+    limit: Option<i64>,
+}
+
+#[derive(Deserialize)]
 struct ContributeRequest {
     name: String,
     #[serde(default)]
@@ -298,6 +305,19 @@ async fn list_locations(
     Ok(Json(locations))
 }
 
+async fn search_locations_by_name(
+    State(state): State<AppState>,
+    Query(params): Query<NameSearchQuery>,
+) -> AppResult<Json<Vec<Location>>> {
+    let query = params.q.trim();
+    if query.is_empty() {
+        return Ok(Json(Vec::new()));
+    }
+    let limit = params.limit.unwrap_or(20).clamp(1, 50);
+    let locations = db::locations::search_by_name(&state.db, query, limit).await?;
+    Ok(Json(locations))
+}
+
 // --- user library handlers ------------------------------------------------
 
 async fn list_saved(
@@ -427,6 +447,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/search", post(search_json))
         .route("/api/search/image", post(search_image))
         .route("/api/locations", get(list_locations))
+        .route("/api/locations/search", get(search_locations_by_name))
         .route("/api/locations/:id", get(get_location))
         .route("/api/saved", get(list_saved))
         .route(
