@@ -34,11 +34,15 @@ const DEFAULT_VOICE: Voice = { freqs: [220, 277], type: "sine", dur: 0.8, gap: 0
 // that reads as lonely-cave music.
 const MELODY = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
 
+// Named interface sound effects, all synthesized.
+export type SoundEffect = "stone" | "creak" | "chime" | "click";
+
 class SpookyAudio {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null; // drone level
   private droneStarted = false;
   private melodyTimer: ReturnType<typeof setTimeout> | null = null;
+  private noiseBuffer: AudioBuffer | null = null;
   enabled = false;
 
   private ensure() {
@@ -171,6 +175,129 @@ class SpookyAudio {
       osc.start(t0);
       osc.stop(t0 + 2.7);
     });
+  }
+
+  private getNoise(): AudioBuffer {
+    const ctx = this.ctx!;
+    if (this.noiseBuffer) return this.noiseBuffer;
+    const len = Math.floor(ctx.sampleRate);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    this.noiseBuffer = buf;
+    return buf;
+  }
+
+  // A spooky tic for interface actions: heavy stone grind, door creak, an
+  // eerie bell, or a soft tick.
+  playEffect(name: SoundEffect) {
+    if (!this.enabled || !this.ctx) return;
+    if (name === "stone") this.fxStone();
+    else if (name === "creak") this.fxCreak();
+    else if (name === "chime") this.fxChime();
+    else this.fxClick();
+  }
+
+  private fxStone() {
+    const ctx = this.ctx!;
+    const t0 = ctx.currentTime;
+    // Grinding scrape: bandpassed noise sliding down in pitch.
+    const src = ctx.createBufferSource();
+    src.buffer = this.getNoise();
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.Q.value = 1.3;
+    bp.frequency.setValueAtTime(820, t0);
+    bp.frequency.exponentialRampToValueAtTime(130, t0 + 0.5);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.3, t0 + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.55);
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(ctx.destination);
+    src.start(t0);
+    src.stop(t0 + 0.6);
+    // The weight of the slab: a low sine thud beneath the grind.
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(92, t0);
+    osc.frequency.exponentialRampToValueAtTime(54, t0 + 0.4);
+    const og = ctx.createGain();
+    og.gain.setValueAtTime(0.0001, t0);
+    og.gain.exponentialRampToValueAtTime(0.24, t0 + 0.02);
+    og.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.45);
+    osc.connect(og);
+    og.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.5);
+  }
+
+  private fxCreak() {
+    const ctx = this.ctx!;
+    const t0 = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(170, t0);
+    osc.frequency.linearRampToValueAtTime(330, t0 + 0.5);
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 23;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 32;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 600;
+    bp.Q.value = 4;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.1, t0 + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.55);
+    osc.connect(bp);
+    bp.connect(g);
+    g.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.6);
+    lfo.start(t0);
+    lfo.stop(t0 + 0.6);
+  }
+
+  private fxChime() {
+    const ctx = this.ctx!;
+    const t0 = ctx.currentTime;
+    const partials = [523.25, 784, 1046.5, 1396.9];
+    const amps = [1, 0.5, 0.32, 0.2];
+    partials.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = f * (i % 2 ? 1.004 : 0.997);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.16 * amps[i], t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.8);
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0 + 1.9);
+    });
+  }
+
+  private fxClick() {
+    const ctx = this.ctx!;
+    const t0 = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(420, t0);
+    osc.frequency.exponentialRampToValueAtTime(180, t0 + 0.08);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.16, t0 + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.12);
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.13);
   }
 
   playCategory(category: string) {

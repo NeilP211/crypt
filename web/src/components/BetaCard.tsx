@@ -1,3 +1,7 @@
+"use client";
+
+import { spookyAudio } from "@/lib/audio";
+
 // Sidebar footer: a wrapped mummy, a beta notice, and a feedback mailto.
 // Uses mt-auto so it settles into the bottom of the sidebar column.
 export function BetaCard() {
@@ -17,6 +21,7 @@ export function BetaCard() {
         </p>
         <a
           href="mailto:neilpatel1623@gmail.com?subject=Crypt%20beta%20feedback"
+          onClick={() => spookyAudio.playEffect("chime")}
           className="mt-3 flex items-center justify-center gap-2 rounded-md border border-crimson/50 bg-crimson/10 px-3 py-2 text-xs font-medium text-crimson transition hover:bg-crimson/20 hover:text-crimson-bright"
         >
           Send a suggestion

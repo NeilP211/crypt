@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { CategoryGraphic } from "./HauntedGraphics";
 import { api, ApiError } from "@/lib/api";
+import { spookyAudio } from "@/lib/audio";
 import { useAuth } from "@/lib/auth";
 import { formatDistance, formatScore, titleCase } from "@/lib/format";
 import type { ScoredLocation } from "@/lib/types";
@@ -38,9 +39,11 @@ export function ResultCard({ result, rank, selected, onOpen }: ResultCardProps) 
       if (saved) {
         await api.unsave(result.id, token);
         setSaved(false);
+        spookyAudio.playEffect("click");
       } else {
         await api.save(result.id, token);
         setSaved(true);
+        spookyAudio.playEffect("chime");
       }
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "save failed");

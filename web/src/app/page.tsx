@@ -131,7 +131,10 @@ export default function HomePage() {
           </div>
           <button
             type="button"
-            onClick={() => setCollapsed(true)}
+            onClick={() => {
+              spookyAudio.playEffect("stone");
+              setCollapsed(true);
+            }}
             aria-label="Hide panel"
             title="Hide panel"
             className="-mr-1 mt-0.5 shrink-0 rounded-md border border-ink-700 p-1.5 text-bone-400 transition hover:border-teal hover:text-teal-bright"
@@ -191,7 +194,10 @@ export default function HomePage() {
 
       <button
         type="button"
-        onClick={() => setCollapsed(false)}
+        onClick={() => {
+          spookyAudio.playEffect("creak");
+          setCollapsed(false);
+        }}
         aria-label="Show panel"
         title="Show search panel"
         className={

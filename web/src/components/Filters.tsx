@@ -2,6 +2,7 @@
 
 import { CATEGORIES } from "./HauntedGraphics";
 import { InfoTip } from "./InfoTip";
+import { spookyAudio } from "@/lib/audio";
 
 interface FiltersProps {
   categories: string[];
@@ -33,7 +34,10 @@ export function Filters({
           </p>
           {categories.length > 0 && (
             <button
-              onClick={() => onCategoriesChange([])}
+              onClick={() => {
+                spookyAudio.playEffect("click");
+                onCategoriesChange([]);
+              }}
               className="font-mono text-[10px] text-bone-400 underline hover:text-bone-200"
             >
               clear
@@ -46,7 +50,10 @@ export function Filters({
             return (
               <button
                 key={key}
-                onClick={() => onCategoriesChange(toggle(categories, key))}
+                onClick={() => {
+                  spookyAudio.playEffect("click");
+                  onCategoriesChange(toggle(categories, key));
+                }}
                 className={
                   "rounded-full border px-2.5 py-1 text-[11px] transition " +
                   (active
@@ -71,7 +78,10 @@ export function Filters({
           <input
             type="checkbox"
             checked={useLocation}
-            onChange={(e) => onUseLocationChange(e.target.checked)}
+            onChange={(e) => {
+              spookyAudio.playEffect("click");
+              onUseLocationChange(e.target.checked);
+            }}
             className="accent-teal"
           />
           Rank search by distance from my location

@@ -58,6 +58,7 @@ export function Nav() {
             <NavLink href="/login">Sign in</NavLink>
             <Link
               href="/register"
+              onClick={() => spookyAudio.playEffect("click")}
               className="rounded bg-teal px-3 py-1.5 text-xs font-medium text-ink-950 transition hover:bg-teal-bright"
             >
               Register
@@ -75,7 +76,10 @@ function SoundToggle() {
     <button
       type="button"
       onClick={() => {
-        void spookyAudio.toggle().then(setOn);
+        void spookyAudio.toggle().then((nowOn) => {
+          setOn(nowOn);
+          if (nowOn) spookyAudio.playEffect("chime");
+        });
       }}
       aria-label={on ? "Turn ambient sound off" : "Turn ambient sound on"}
       title={on ? "Ambient sound on" : "Ambient sound off"}
@@ -112,6 +116,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
+      onClick={() => spookyAudio.playEffect("click")}
       className="rounded px-2.5 py-1.5 text-bone-300 transition hover:bg-ink-700 hover:text-bone-200"
     >
       {children}
