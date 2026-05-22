@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { CategoryGraphic } from "./HauntedGraphics";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatDistance, formatScore, titleCase } from "@/lib/format";
@@ -66,9 +67,7 @@ export function ResultCard({ result, rank, selected, onOpen }: ResultCardProps) 
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-ink-800 font-display text-2xl text-bone-600">
-            ⌂
-          </div>
+          <CategoryGraphic name={result.name} structureType={result.structure_type} />
         )}
         <span className="absolute left-0 top-0 flex h-5 w-5 items-center justify-center bg-crimson text-xs font-bold text-bone-200">
           {rank}
