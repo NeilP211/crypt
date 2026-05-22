@@ -336,12 +336,37 @@ const STRUCT_FALLBACK: Record<string, string> = {
   ruins: "ruins",
 };
 
-function pickGraphic(name: string, structureType: string): () => JSX.Element {
+/** Classify a location into a graphic/filter category from its name (most
+ * specific) then its structure_type, defaulting to a graveyard. */
+export function categoryOf(name: string, structureType: string): string {
   for (const [re, key] of NAME_RULES) {
-    if (re.test(name)) return GRAPHICS[key];
+    if (re.test(name ?? "")) return key;
   }
-  const fallback = STRUCT_FALLBACK[structureType];
-  return (fallback && GRAPHICS[fallback]) || Graveyard;
+  return STRUCT_FALLBACK[structureType] ?? "graveyard";
+}
+
+// The categories used by both the detail graphic and the map filters.
+export const CATEGORIES: { key: string; label: string }[] = [
+  { key: "house", label: "House" },
+  { key: "graveyard", label: "Cemetery" },
+  { key: "church", label: "Church" },
+  { key: "school", label: "School" },
+  { key: "hospital", label: "Asylum" },
+  { key: "theater", label: "Theater" },
+  { key: "hotel", label: "Hotel" },
+  { key: "jail", label: "Prison" },
+  { key: "factory", label: "Factory" },
+  { key: "mine", label: "Mine" },
+  { key: "rail", label: "Railroad" },
+  { key: "bridge", label: "Bridge" },
+  { key: "lighthouse", label: "Lighthouse" },
+  { key: "castle", label: "Castle" },
+  { key: "military", label: "Military" },
+  { key: "ruins", label: "Ruins" },
+];
+
+function pickGraphic(name: string, structureType: string): () => JSX.Element {
+  return GRAPHICS[categoryOf(name, structureType)] ?? Graveyard;
 }
 
 export function CategoryGraphic({

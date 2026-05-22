@@ -1,25 +1,15 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Filters } from "@/components/Filters";
+import { categoryOf } from "@/components/HauntedGraphics";
 import { LocationDetail, type DetailInfo } from "@/components/LocationDetail";
 import { MapView } from "@/components/MapView";
 import { ResultList } from "@/components/ResultList";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { api, ApiError } from "@/lib/api";
-import type {
-  BoundingBox,
-  Location,
-  ScoredLocation,
-  SearchFilters,
-} from "@/lib/types";
-
-const EMPTY_FILTERS: SearchFilters = {
-  era: [],
-  structure_type: [],
-  verified_status: [],
-};
+import type { BoundingBox, Location, ScoredLocation } from "@/lib/types";
 
 function currentPosition(): Promise<{ lat: number; lng: number } | undefined> {
   return new Promise((resolve) => {
@@ -43,9 +33,20 @@ export default function HomePage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [detail, setDetail] = useState<DetailInfo | null>(null);
 
-  const [filters, setFilters] = useState<SearchFilters>(EMPTY_FILTERS);
+  const [categories, setCategories] = useState<string[]>([]);
   const [useLocation, setUseLocation] = useState(false);
   const [radiusKm, setRadiusKm] = useState(50);
+
+  // Category filter applies to the ambient map dots (not the photo results).
+  const visibleLocations = useMemo(
+    () =>
+      categories.length === 0
+        ? locations
+        : locations.filter((l) =>
+            categories.includes(categoryOf(l.name, l.structure_type)),
+          ),
+    [locations, categories],
+  );
 
   const bboxTimer = useRef<ReturnType<typeof setTimeout>>();
   const handleBbox = useCallback((bbox: BoundingBox) => {
@@ -71,7 +72,6 @@ export default function HomePage() {
           file,
           origin,
           radiusMeters: useLocation ? radiusKm * 1000 : 0,
-          filters,
           limit: 20,
         });
         setResults(found);
@@ -83,7 +83,7 @@ export default function HomePage() {
         setLoading(false);
       }
     },
-    [filters, useLocation, radiusKm],
+    [useLocation, radiusKm],
   );
 
   const openDetail = useCallback((loc: DetailInfo & { id?: string }) => {
@@ -123,8 +123,8 @@ export default function HomePage() {
         )}
 
         <Filters
-          filters={filters}
-          onChange={setFilters}
+          categories={categories}
+          onCategoriesChange={setCategories}
           useLocation={useLocation}
           onUseLocationChange={setUseLocation}
           radiusKm={radiusKm}
@@ -143,7 +143,7 @@ export default function HomePage() {
 
       <div className="relative flex-1">
         <MapView
-          locations={locations}
+          locations={visibleLocations}
           results={results}
           onBboxChange={handleBbox}
           onOpenDetail={openDetail}

@@ -1,12 +1,11 @@
 "use client";
 
-// Faint apparitions — ghosts, bats, and a witch — drifting across the
-// viewport. They scurry away from the cursor when it gets close. The overlay
-// is pointer-events-none so it never blocks the UI, and it hides itself for
-// users who prefer reduced motion (see globals.css).
+// Faint apparitions — ghosts, bats, and a witch — drift across the viewport.
+// When the cursor gets close they panic and bolt off-screen, then reappear
+// from an edge a few seconds later. Pointer-events-none so they never block
+// the UI; disabled entirely under prefers-reduced-motion.
 
 import { useEffect, useRef } from "react";
-import type { CSSProperties } from "react";
 
 function Ghost() {
   return (
@@ -44,66 +43,121 @@ function Witch() {
   );
 }
 
-interface Spook {
-  el: React.ReactNode;
-  top: string;
-  drift: "left" | "right";
-  duration: number;
-  delay: number;
+const KINDS = { ghost: Ghost, bat: Bat, witch: Witch } as const;
+
+interface SpookDef {
+  kind: keyof typeof KINDS;
+  w: number;
+  h: number;
   opacity: number;
-  bob?: number;
+  speed: number; // px/s drift
 }
 
-const SPOOKS: Spook[] = [
-  { el: <Ghost />, top: "16%", drift: "right", duration: 44, delay: 0, opacity: 0.2, bob: 5 },
-  { el: <Ghost />, top: "64%", drift: "left", duration: 56, delay: 12, opacity: 0.15, bob: 6 },
-  { el: <Witch />, top: "9%", drift: "left", duration: 30, delay: 7, opacity: 0.24 },
-  { el: <Bat />, top: "28%", drift: "left", duration: 19, delay: 2, opacity: 0.3, bob: 3 },
-  { el: <Bat />, top: "46%", drift: "right", duration: 16, delay: 9, opacity: 0.28, bob: 2.5 },
+const DEFS: SpookDef[] = [
+  { kind: "ghost", w: 44, h: 54, opacity: 0.2, speed: 34 },
+  { kind: "ghost", w: 44, h: 54, opacity: 0.15, speed: 26 },
+  { kind: "witch", w: 72, h: 40, opacity: 0.24, speed: 62 },
+  { kind: "bat", w: 40, h: 18, opacity: 0.3, speed: 95 },
+  { kind: "bat", w: 40, h: 18, opacity: 0.28, speed: 80 },
 ];
 
-const REPEL_RADIUS = 130; // px
-const REPEL_STRENGTH = 110; // px max push
+const FLEE_RADIUS = 150;
+const FLEE_SPEED = 680; // px/s when scurrying off-screen
+const BOB_AMP = 9;
+const BOB_FREQ = 1.8;
+
+interface State {
+  x: number;
+  y: number;
+  baseY: number;
+  dir: 1 | -1;
+  fleeing: boolean;
+  dead: boolean;
+  respawnAt: number;
+  phase: number;
+}
 
 export function SpookyOverlay() {
-  const repelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const elRefs = useRef<(HTMLDivElement | null)[]>([]);
   const mouse = useRef<{ x: number; y: number } | null>(null);
-  const offsets = useRef(SPOOKS.map(() => ({ x: 0, y: 0 })));
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const W = () => window.innerWidth;
+    const H = () => window.innerHeight;
+
+    const spawn = (def: SpookDef, st?: State): State => {
+      const dir: 1 | -1 = st ? ((-st.dir) as 1 | -1) : Math.random() < 0.5 ? 1 : -1;
+      const baseY = 0.05 * H() + Math.random() * 0.7 * H();
+      const x = dir === 1 ? -def.w - 20 : W() + 20;
+      return { x, y: baseY, baseY, dir, fleeing: false, dead: false, respawnAt: 0, phase: Math.random() * Math.PI * 2 };
+    };
+
+    const states: State[] = DEFS.map((d) => spawn(d));
+    // stagger initial entry across the width
+    states.forEach((s, i) => {
+      s.x = (W() / DEFS.length) * i;
+      s.dir = i % 2 === 0 ? 1 : -1;
+    });
+
     const onMove = (e: MouseEvent) => {
       mouse.current = { x: e.clientX, y: e.clientY };
     };
     window.addEventListener("mousemove", onMove);
 
+    let last = performance.now();
     let raf = 0;
-    const tick = () => {
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
       const m = mouse.current;
-      repelRefs.current.forEach((el, i) => {
+
+      states.forEach((s, i) => {
+        const def = DEFS[i];
+        const el = elRefs.current[i];
         if (!el) return;
-        const off = offsets.current[i];
-        let tx = 0;
-        let ty = 0;
-        if (m) {
-          const rect = el.getBoundingClientRect();
-          // Center without the current repulsion offset, so it settles.
-          const cx = rect.left + rect.width / 2 - off.x;
-          const cy = rect.top + rect.height / 2 - off.y;
-          const dx = cx - m.x;
-          const dy = cy - m.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < REPEL_RADIUS && dist > 0.01) {
-            const force = (1 - dist / REPEL_RADIUS) * REPEL_STRENGTH;
-            tx = (dx / dist) * force;
-            ty = (dy / dist) * force;
+
+        if (s.dead) {
+          if (now >= s.respawnAt) Object.assign(s, spawn(def, s));
+          else {
+            el.style.opacity = "0";
+            return;
           }
         }
-        // Quick to flee, slow to drift back.
-        const ease = tx || ty ? 0.3 : 0.08;
-        off.x += (tx - off.x) * ease;
-        off.y += (ty - off.y) * ease;
-        el.style.transform = `translate(${off.x.toFixed(1)}px, ${off.y.toFixed(1)}px)`;
+
+        const cx = s.x + def.w / 2;
+        const cy = s.y + def.h / 2;
+        if (m && !s.fleeing) {
+          if (Math.hypot(cx - m.x, cy - m.y) < FLEE_RADIUS) s.fleeing = true;
+        }
+
+        if (s.fleeing) {
+          let ax = s.dir;
+          let ay = 0;
+          if (m) {
+            const dx = cx - m.x;
+            const dy = cy - m.y;
+            const d = Math.hypot(dx, dy) || 1;
+            ax = dx / d;
+            ay = dy / d;
+          }
+          s.x += ax * FLEE_SPEED * dt;
+          s.y += ay * FLEE_SPEED * dt;
+        } else {
+          s.x += s.dir * def.speed * dt;
+          s.y = s.baseY + Math.sin(now / 1000 * BOB_FREQ + s.phase) * BOB_AMP;
+        }
+
+        if (s.x < -def.w - 160 || s.x > W() + 160 || s.y < -def.h - 160 || s.y > H() + 160) {
+          s.dead = true;
+          s.respawnAt = now + 2500 + Math.random() * 5000;
+        }
+
+        el.style.opacity = String(def.opacity);
+        el.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
       });
+
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -116,24 +170,17 @@ export function SpookyOverlay() {
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
-      {SPOOKS.map((s, i) => {
-        const outer: CSSProperties = {
-          top: s.top,
-          opacity: s.opacity,
-          animation: `spook-drift-${s.drift} ${s.duration}s linear ${s.delay}s infinite`,
-        };
-        const inner: CSSProperties = s.bob
-          ? { animation: `spook-bob ${s.bob}s ease-in-out infinite` }
-          : {};
+      {DEFS.map((d, i) => {
+        const Sprite = KINDS[d.kind];
         return (
-          <div key={i} className="spook" style={outer}>
-            <div
-              ref={(el) => {
-                repelRefs.current[i] = el;
-              }}
-            >
-              <div style={inner}>{s.el}</div>
-            </div>
+          <div
+            key={i}
+            ref={(el) => {
+              elRefs.current[i] = el;
+            }}
+            style={{ position: "absolute", left: 0, top: 0, opacity: 0, willChange: "transform" }}
+          >
+            <Sprite />
           </div>
         );
       })}

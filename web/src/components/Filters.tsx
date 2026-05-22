@@ -1,16 +1,10 @@
 "use client";
 
-import { titleCase } from "@/lib/format";
-import {
-  ERA_OPTIONS,
-  STRUCTURE_OPTIONS,
-  VERIFIED_OPTIONS,
-  type SearchFilters,
-} from "@/lib/types";
+import { CATEGORIES } from "./HauntedGraphics";
 
 interface FiltersProps {
-  filters: SearchFilters;
-  onChange: (filters: SearchFilters) => void;
+  categories: string[];
+  onCategoriesChange: (categories: string[]) => void;
   useLocation: boolean;
   onUseLocationChange: (value: boolean) => void;
   radiusKm: number;
@@ -18,53 +12,12 @@ interface FiltersProps {
 }
 
 function toggle(list: string[], value: string): string[] {
-  return list.includes(value)
-    ? list.filter((v) => v !== value)
-    : [...list, value];
-}
-
-function ChipGroup({
-  label,
-  options,
-  selected,
-  onToggle,
-}: {
-  label: string;
-  options: readonly string[];
-  selected: string[];
-  onToggle: (value: string) => void;
-}) {
-  return (
-    <div>
-      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-bone-400">
-        {label}
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {options.map((option) => {
-          const active = selected.includes(option);
-          return (
-            <button
-              key={option}
-              onClick={() => onToggle(option)}
-              className={
-                "rounded-full border px-2.5 py-1 text-[11px] transition " +
-                (active
-                  ? "border-teal bg-teal/15 text-teal-bright"
-                  : "border-ink-600 text-bone-400 hover:border-bone-400")
-              }
-            >
-              {titleCase(option)}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
 export function Filters({
-  filters,
-  onChange,
+  categories,
+  onCategoriesChange,
   useLocation,
   onUseLocationChange,
   radiusKm,
@@ -72,37 +25,54 @@ export function Filters({
 }: FiltersProps) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-ink-700 bg-ink-900 p-3">
-      <ChipGroup
-        label="Structure"
-        options={STRUCTURE_OPTIONS}
-        selected={filters.structure_type}
-        onToggle={(v) =>
-          onChange({ ...filters, structure_type: toggle(filters.structure_type, v) })
-        }
-      />
-      <ChipGroup
-        label="Era"
-        options={ERA_OPTIONS}
-        selected={filters.era}
-        onToggle={(v) => onChange({ ...filters, era: toggle(filters.era, v) })}
-      />
-      <ChipGroup
-        label="Status"
-        options={VERIFIED_OPTIONS}
-        selected={filters.verified_status}
-        onToggle={(v) =>
-          onChange({ ...filters, verified_status: toggle(filters.verified_status, v) })
-        }
-      />
+      <div>
+        <div className="mb-1.5 flex items-center justify-between">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-bone-400">
+            Show on map
+          </p>
+          {categories.length > 0 && (
+            <button
+              onClick={() => onCategoriesChange([])}
+              className="font-mono text-[10px] text-bone-400 underline hover:text-bone-200"
+            >
+              clear
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {CATEGORIES.map(({ key, label }) => {
+            const active = categories.includes(key);
+            return (
+              <button
+                key={key}
+                onClick={() => onCategoriesChange(toggle(categories, key))}
+                className={
+                  "rounded-full border px-2.5 py-1 text-[11px] transition " +
+                  (active
+                    ? "border-teal bg-teal/15 text-teal-bright"
+                    : "border-ink-600 text-bone-400 hover:border-bone-400")
+                }
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-1.5 text-[10px] italic text-bone-400">
+          {categories.length === 0
+            ? "All categories shown."
+            : "Only the selected categories appear on the map."}
+        </p>
+      </div>
 
-      <label className="flex items-center gap-2 text-xs text-bone-300">
+      <label className="flex items-center gap-2 border-t border-ink-700 pt-3 text-xs text-bone-300">
         <input
           type="checkbox"
           checked={useLocation}
           onChange={(e) => onUseLocationChange(e.target.checked)}
           className="accent-teal"
         />
-        Rank by distance from my location
+        Rank search by distance from my location
       </label>
 
       {useLocation && (
