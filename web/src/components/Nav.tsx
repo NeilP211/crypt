@@ -9,7 +9,7 @@ export function Nav() {
   const { user, logout, loading } = useAuth();
 
   return (
-    <header className="flex items-center justify-between border-b border-ink-700 bg-ink-900/95 px-5 py-3 backdrop-blur">
+    <header className="relative z-40 flex items-center justify-between border-b border-ink-700 bg-ink-900/95 px-5 py-3 backdrop-blur">
       <Link href="/" className="flex items-center gap-2.5">
         <img
           src="/brand.png"
