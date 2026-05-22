@@ -40,7 +40,7 @@ interface MapViewProps {
 function ambientMarker(): HTMLElement {
   const el = document.createElement("div");
   el.className =
-    "h-2.5 w-2.5 rounded-full border border-ink-950 bg-haze-400/70 shadow";
+    "h-2.5 w-2.5 rounded-full border border-ink-950 bg-bone-400/70 shadow";
   return el;
 }
 
@@ -51,8 +51,8 @@ function resultMarker(rank: number, selected: boolean): HTMLElement {
     "flex h-7 w-7 cursor-pointer items-center justify-center rounded-full " +
     "border-2 text-xs font-bold shadow-lg transition " +
     (selected
-      ? "border-rust-bright bg-rust-bright text-ink-950 scale-125"
-      : "border-ink-950 bg-rust text-ink-950 hover:scale-110");
+      ? "border-gold-bright bg-gold-bright text-ink-950 scale-125"
+      : "border-ink-950 bg-gold text-ink-950 hover:scale-110");
   return el;
 }
 

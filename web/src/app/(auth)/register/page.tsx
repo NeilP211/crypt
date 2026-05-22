@@ -39,44 +39,44 @@ export default function RegisterPage() {
       onSubmit={submit}
       className="w-full max-w-sm rounded-lg border border-ink-700 bg-ink-900 p-6"
     >
-      <h1 className="font-mono text-lg font-semibold text-haze-200">
+      <h1 className="font-mono text-lg font-semibold text-bone-200">
         Create an account
       </h1>
-      <p className="mt-1 text-xs text-haze-400">
+      <p className="mt-1 text-xs text-bone-400">
         Join the contributor community mapping forgotten places.
       </p>
 
-      <label className="mt-4 block text-xs text-haze-400">
+      <label className="mt-4 block text-xs text-bone-400">
         Email
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 outline-none focus:border-rust"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
         />
       </label>
 
-      <label className="mt-3 block text-xs text-haze-400">
+      <label className="mt-3 block text-xs text-bone-400">
         Display name
         <input
           type="text"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 outline-none focus:border-rust"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
         />
       </label>
 
-      <label className="mt-3 block text-xs text-haze-400">
+      <label className="mt-3 block text-xs text-bone-400">
         Password
         <input
           type="password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 outline-none focus:border-rust"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
         />
-        <span className="mt-1 block text-[10px] text-haze-400">
+        <span className="mt-1 block text-[10px] text-bone-400">
           at least 8 characters
         </span>
       </label>
@@ -86,14 +86,14 @@ export default function RegisterPage() {
       <button
         type="submit"
         disabled={busy}
-        className="mt-4 w-full rounded bg-rust py-2 text-sm font-medium text-ink-950 transition hover:bg-rust-bright disabled:opacity-50"
+        className="mt-4 w-full rounded bg-gold py-2 text-sm font-medium text-ink-950 transition hover:bg-gold-bright disabled:opacity-50"
       >
         {busy ? "Creating…" : "Create account"}
       </button>
 
-      <p className="mt-3 text-center text-xs text-haze-400">
+      <p className="mt-3 text-center text-xs text-bone-400">
         Already registered?{" "}
-        <Link href="/login" className="text-rust hover:text-rust-bright">
+        <Link href="/login" className="text-gold hover:text-gold-bright">
           Sign in
         </Link>
       </p>

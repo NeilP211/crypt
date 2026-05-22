@@ -37,8 +37,8 @@ export function UploadDropzone({ onFile, disabled }: UploadDropzoneProps) {
         (disabled
           ? "cursor-not-allowed border-ink-700 opacity-50"
           : dragging
-            ? "border-rust bg-rust/10"
-            : "border-ink-600 hover:border-rust/60 hover:bg-ink-800")
+            ? "border-gold bg-gold/10"
+            : "border-ink-600 hover:border-gold/60 hover:bg-ink-800")
       }
     >
       <input
@@ -49,8 +49,8 @@ export function UploadDropzone({ onFile, disabled }: UploadDropzoneProps) {
         disabled={disabled}
         onChange={(e) => accept(e.target.files?.[0])}
       />
-      <p className="font-mono text-sm text-haze-200">Drop a photo here</p>
-      <p className="mt-1 text-xs text-haze-400">
+      <p className="font-mono text-sm text-bone-200">Drop a photo here</p>
+      <p className="mt-1 text-xs text-bone-400">
         or click to browse — find places that look like it
       </p>
     </div>

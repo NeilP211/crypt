@@ -36,7 +36,7 @@ function ChipGroup({
 }) {
   return (
     <div>
-      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-haze-400">
+      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-bone-400">
         {label}
       </p>
       <div className="flex flex-wrap gap-1.5">
@@ -49,8 +49,8 @@ function ChipGroup({
               className={
                 "rounded-full border px-2.5 py-1 text-[11px] transition " +
                 (active
-                  ? "border-rust bg-rust/15 text-rust-bright"
-                  : "border-ink-600 text-haze-400 hover:border-haze-400")
+                  ? "border-gold bg-gold/15 text-gold-bright"
+                  : "border-ink-600 text-bone-400 hover:border-bone-400")
               }
             >
               {titleCase(option)}
@@ -95,18 +95,18 @@ export function Filters({
         }
       />
 
-      <label className="flex items-center gap-2 text-xs text-haze-300">
+      <label className="flex items-center gap-2 text-xs text-bone-300">
         <input
           type="checkbox"
           checked={useLocation}
           onChange={(e) => onUseLocationChange(e.target.checked)}
-          className="accent-rust"
+          className="accent-gold"
         />
         Rank by distance from my location
       </label>
 
       {useLocation && (
-        <label className="flex flex-col gap-1 text-xs text-haze-400">
+        <label className="flex flex-col gap-1 text-xs text-bone-400">
           <span>Search radius: {radiusKm} km</span>
           <input
             type="range"
@@ -114,7 +114,7 @@ export function Filters({
             max={500}
             value={radiusKm}
             onChange={(e) => onRadiusChange(Number(e.target.value))}
-            className="accent-rust"
+            className="accent-gold"
           />
         </label>
       )}

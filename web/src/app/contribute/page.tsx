@@ -72,8 +72,8 @@ export default function ContributePage() {
   if (!user) {
     return (
       <Centered>
-        <p className="text-sm text-haze-400">
-          <Link href="/login" className="text-rust hover:text-rust-bright">
+        <p className="text-sm text-bone-400">
+          <Link href="/login" className="text-gold hover:text-gold-bright">
             Sign in
           </Link>{" "}
           to contribute a location.
@@ -83,14 +83,14 @@ export default function ContributePage() {
   }
 
   const field =
-    "mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 outline-none focus:border-rust";
+    "mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold";
 
   return (
     <div className="mx-auto h-full max-w-2xl overflow-y-auto p-6">
-      <h1 className="font-mono text-lg font-semibold text-haze-200">
+      <h1 className="font-mono text-lg font-semibold text-bone-200">
         Contribute a location
       </h1>
-      <p className="mt-0.5 text-xs text-haze-400">
+      <p className="mt-0.5 text-xs text-bone-400">
         Submissions enter a review queue before joining the public index.
       </p>
 
@@ -98,7 +98,7 @@ export default function ContributePage() {
         onSubmit={submit}
         className="mt-4 flex flex-col gap-3 rounded-lg border border-ink-700 bg-ink-900 p-4"
       >
-        <label className="block text-xs text-haze-400">
+        <label className="block text-xs text-bone-400">
           Name
           <input
             required
@@ -108,7 +108,7 @@ export default function ContributePage() {
           />
         </label>
 
-        <label className="block text-xs text-haze-400">
+        <label className="block text-xs text-bone-400">
           Description
           <textarea
             rows={3}
@@ -119,7 +119,7 @@ export default function ContributePage() {
         </label>
 
         <div className="flex gap-3">
-          <label className="block flex-1 text-xs text-haze-400">
+          <label className="block flex-1 text-xs text-bone-400">
             Latitude
             <input
               required
@@ -129,7 +129,7 @@ export default function ContributePage() {
               placeholder="52.5145"
             />
           </label>
-          <label className="block flex-1 text-xs text-haze-400">
+          <label className="block flex-1 text-xs text-bone-400">
             Longitude
             <input
               required
@@ -142,7 +142,7 @@ export default function ContributePage() {
         </div>
 
         <div className="flex gap-3">
-          <label className="block flex-1 text-xs text-haze-400">
+          <label className="block flex-1 text-xs text-bone-400">
             Era
             <select
               value={form.era}
@@ -156,7 +156,7 @@ export default function ContributePage() {
               ))}
             </select>
           </label>
-          <label className="block flex-1 text-xs text-haze-400">
+          <label className="block flex-1 text-xs text-bone-400">
             Structure type
             <select
               value={form.structure_type}
@@ -174,7 +174,7 @@ export default function ContributePage() {
           </label>
         </div>
 
-        <label className="block text-xs text-haze-400">
+        <label className="block text-xs text-bone-400">
           Image URL
           <input
             value={form.image_url}
@@ -189,7 +189,7 @@ export default function ContributePage() {
         <button
           type="submit"
           disabled={busy}
-          className="rounded bg-rust py-2 text-sm font-medium text-ink-950 transition hover:bg-rust-bright disabled:opacity-50"
+          className="rounded bg-gold py-2 text-sm font-medium text-ink-950 transition hover:bg-gold-bright disabled:opacity-50"
         >
           {busy ? "Submitting…" : "Submit for review"}
         </button>
@@ -197,7 +197,7 @@ export default function ContributePage() {
 
       {mine.length > 0 && (
         <section className="mt-6">
-          <h2 className="font-mono text-sm font-semibold text-haze-200">
+          <h2 className="font-mono text-sm font-semibold text-bone-200">
             Your submissions
           </h2>
           <ul className="mt-2 flex flex-col gap-2">
@@ -206,8 +206,8 @@ export default function ContributePage() {
                 key={c.id}
                 className="flex items-center justify-between rounded border border-ink-700 bg-ink-900 px-3 py-2"
               >
-                <span className="text-sm text-haze-200">{c.name}</span>
-                <span className="rounded border border-ink-600 px-2 py-0.5 text-[10px] uppercase tracking-wide text-haze-400">
+                <span className="text-sm text-bone-200">{c.name}</span>
+                <span className="rounded border border-ink-600 px-2 py-0.5 text-[10px] uppercase tracking-wide text-bone-400">
                   {c.status}
                 </span>
               </li>

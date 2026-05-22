@@ -93,10 +93,10 @@ export default function HomePage() {
     <div className="flex h-full">
       <aside className="flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-ink-700 bg-ink-950 p-4">
         <div>
-          <h1 className="font-mono text-sm font-semibold text-haze-200">
+          <h1 className="font-mono text-sm font-semibold text-bone-200">
             Visual search
           </h1>
-          <p className="mt-0.5 text-xs text-haze-400">
+          <p className="mt-0.5 text-xs text-bone-400">
             Find abandoned places that resemble a photo, ranked by a hybrid of
             CLIP similarity, distance, and metadata.
           </p>
@@ -111,7 +111,7 @@ export default function HomePage() {
               alt="query"
               className="h-12 w-12 rounded object-cover"
             />
-            <span className="text-xs text-haze-400">query image</span>
+            <span className="text-xs text-bone-400">query image</span>
           </div>
         )}
 

@@ -17,7 +17,7 @@ interface ResultCardProps {
 const STATUS_STYLES: Record<string, string> = {
   verified: "text-verified border-verified/40",
   demolished: "text-demolished border-demolished/40",
-  unverified: "text-haze-400 border-ink-600",
+  unverified: "text-bone-400 border-ink-600",
 };
 
 export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps) {
@@ -54,7 +54,7 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
       className={
         "flex cursor-pointer gap-3 rounded-lg border p-3 transition " +
         (selected
-          ? "border-rust bg-ink-800"
+          ? "border-gold bg-ink-800"
           : "border-ink-700 bg-ink-900 hover:border-ink-600")
       }
     >
@@ -66,30 +66,30 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-haze-400">
+          <div className="flex h-full w-full items-center justify-center text-xs text-bone-400">
             no image
           </div>
         )}
-        <span className="absolute left-0 top-0 flex h-5 w-5 items-center justify-center bg-rust text-xs font-bold text-ink-950">
+        <span className="absolute left-0 top-0 flex h-5 w-5 items-center justify-center bg-gold text-xs font-bold text-ink-950">
           {rank}
         </span>
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="truncate text-sm font-semibold text-haze-200">
+          <h3 className="truncate text-sm font-semibold text-bone-200">
             {result.name}
           </h3>
-          <span className="shrink-0 font-mono text-sm font-bold text-rust-bright">
+          <span className="shrink-0 font-mono text-sm font-bold text-gold-bright">
             {formatScore(result.hybrid_score)}
           </span>
         </div>
 
         <div className="mt-1 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-wide">
-          <span className="rounded border border-ink-600 px-1.5 py-0.5 text-haze-400">
+          <span className="rounded border border-ink-600 px-1.5 py-0.5 text-bone-400">
             {titleCase(result.structure_type)}
           </span>
-          <span className="rounded border border-ink-600 px-1.5 py-0.5 text-haze-400">
+          <span className="rounded border border-ink-600 px-1.5 py-0.5 text-bone-400">
             {titleCase(result.era)}
           </span>
           <span
@@ -103,21 +103,21 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
         </div>
 
         <div className="mt-2 flex items-center justify-between">
-          <dl className="flex gap-3 font-mono text-[10px] text-haze-400">
+          <dl className="flex gap-3 font-mono text-[10px] text-bone-400">
             <span>
               <dt className="inline">vec </dt>
-              <dd className="inline text-haze-300">
+              <dd className="inline text-bone-300">
                 {formatScore(result.vector_score)}
               </dd>
             </span>
             <span>
               <dt className="inline">geo </dt>
-              <dd className="inline text-haze-300">
+              <dd className="inline text-bone-300">
                 {formatScore(result.geo_score)}
               </dd>
             </span>
             {result.distance_meters >= 0 && (
-              <span className="text-haze-300">
+              <span className="text-bone-300">
                 {formatDistance(result.distance_meters)}
               </span>
             )}
@@ -131,8 +131,8 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
             className={
               "rounded border px-2 py-0.5 text-[11px] transition disabled:opacity-50 " +
               (saved
-                ? "border-rust bg-rust/15 text-rust-bright"
-                : "border-ink-600 text-haze-300 hover:border-rust")
+                ? "border-gold bg-gold/15 text-gold-bright"
+                : "border-ink-600 text-bone-300 hover:border-gold")
             }
           >
             {saved ? "Saved" : "Save"}

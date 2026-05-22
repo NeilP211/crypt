@@ -9,12 +9,19 @@ export function Nav() {
 
   return (
     <header className="flex items-center justify-between border-b border-ink-700 bg-ink-900/95 px-5 py-3 backdrop-blur">
-      <Link href="/" className="flex items-baseline gap-2">
-        <span className="font-mono text-lg font-bold tracking-[0.3em] text-rust">
-          CRYPT
-        </span>
-        <span className="hidden text-xs text-haze-400 sm:inline">
-          geospatial visual search
+      <Link href="/" className="flex items-center gap-2.5">
+        <img
+          src="/brand.png"
+          alt="Crypt"
+          className="h-8 w-8 rounded-md shadow-glow"
+        />
+        <span className="flex items-baseline gap-2">
+          <span className="font-mono text-lg font-bold tracking-[0.3em] text-gold">
+            CRYPT
+          </span>
+          <span className="hidden text-xs text-bone-400 sm:inline">
+            geospatial visual search
+          </span>
         </span>
       </Link>
 
@@ -25,12 +32,12 @@ export function Nav() {
 
         {!loading && user && (
           <div className="ml-3 flex items-center gap-3 border-l border-ink-700 pl-3">
-            <span className="hidden text-xs text-haze-300 sm:inline">
+            <span className="hidden text-xs text-bone-300 sm:inline">
               {user.display_name || user.email}
             </span>
             <button
               onClick={logout}
-              className="rounded border border-ink-600 px-2.5 py-1 text-xs text-haze-300 transition hover:border-rust hover:text-rust-bright"
+              className="rounded border border-ink-600 px-2.5 py-1 text-xs text-bone-300 transition hover:border-gold hover:text-gold-bright"
             >
               Sign out
             </button>
@@ -42,7 +49,7 @@ export function Nav() {
             <NavLink href="/login">Sign in</NavLink>
             <Link
               href="/register"
-              className="rounded bg-rust px-3 py-1.5 text-xs font-medium text-ink-950 transition hover:bg-rust-bright"
+              className="rounded bg-gold px-3 py-1.5 text-xs font-medium text-ink-950 transition hover:bg-gold-bright"
             >
               Register
             </Link>
@@ -57,7 +64,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="rounded px-2.5 py-1.5 text-haze-300 transition hover:bg-ink-700 hover:text-haze-200"
+      className="rounded px-2.5 py-1.5 text-bone-300 transition hover:bg-ink-700 hover:text-bone-200"
     >
       {children}
     </Link>

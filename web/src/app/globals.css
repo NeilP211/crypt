@@ -12,12 +12,12 @@ body {
 }
 
 body {
-  @apply bg-ink-950 text-haze-200 antialiased;
+  @apply bg-ink-950 text-bone-200 antialiased;
 }
 
 /* Theme the MapLibre controls and popups to match the dark palette. */
 .maplibregl-popup-content {
-  @apply rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 shadow-lg;
+  @apply rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 shadow-lg;
 }
 
 .maplibregl-popup-tip {
@@ -25,7 +25,7 @@ body {
 }
 
 .maplibregl-ctrl-attrib.maplibregl-compact {
-  @apply bg-ink-900/80 text-haze-400;
+  @apply bg-ink-900/80 text-bone-400;
 }
 
 .maplibregl-ctrl-group {

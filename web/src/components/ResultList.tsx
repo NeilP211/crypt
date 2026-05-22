@@ -22,7 +22,7 @@ export function ResultList({
 }: ResultListProps) {
   if (loading) {
     return (
-      <p className="px-1 py-6 text-center font-mono text-sm text-haze-400">
+      <p className="px-1 py-6 text-center font-mono text-sm text-bone-400">
         searching the index…
       </p>
     );
@@ -36,14 +36,14 @@ export function ResultList({
   }
   if (!searched) {
     return (
-      <p className="px-1 py-6 text-center text-sm text-haze-400">
+      <p className="px-1 py-6 text-center text-sm text-bone-400">
         Upload a photo to find visually similar abandoned places.
       </p>
     );
   }
   if (results.length === 0) {
     return (
-      <p className="px-1 py-6 text-center text-sm text-haze-400">
+      <p className="px-1 py-6 text-center text-sm text-bone-400">
         No matches. Try widening the radius or clearing filters.
       </p>
     );
@@ -51,7 +51,7 @@ export function ResultList({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="px-1 font-mono text-xs text-haze-400">
+      <p className="px-1 font-mono text-xs text-bone-400">
         {results.length} result{results.length === 1 ? "" : "s"}, ranked by
         hybrid score
       </p>

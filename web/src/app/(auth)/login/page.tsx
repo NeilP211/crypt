@@ -34,30 +34,30 @@ export default function LoginPage() {
       onSubmit={submit}
       className="w-full max-w-sm rounded-lg border border-ink-700 bg-ink-900 p-6"
     >
-      <h1 className="font-mono text-lg font-semibold text-haze-200">Sign in</h1>
-      <p className="mt-1 text-xs text-haze-400">
+      <h1 className="font-mono text-lg font-semibold text-bone-200">Sign in</h1>
+      <p className="mt-1 text-xs text-bone-400">
         Access saved locations and contribute new sites.
       </p>
 
-      <label className="mt-4 block text-xs text-haze-400">
+      <label className="mt-4 block text-xs text-bone-400">
         Email
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 outline-none focus:border-rust"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
         />
       </label>
 
-      <label className="mt-3 block text-xs text-haze-400">
+      <label className="mt-3 block text-xs text-bone-400">
         Password
         <input
           type="password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-haze-200 outline-none focus:border-rust"
+          className="mt-1 w-full rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 outline-none focus:border-gold"
         />
       </label>
 
@@ -66,14 +66,14 @@ export default function LoginPage() {
       <button
         type="submit"
         disabled={busy}
-        className="mt-4 w-full rounded bg-rust py-2 text-sm font-medium text-ink-950 transition hover:bg-rust-bright disabled:opacity-50"
+        className="mt-4 w-full rounded bg-gold py-2 text-sm font-medium text-ink-950 transition hover:bg-gold-bright disabled:opacity-50"
       >
         {busy ? "Signing in…" : "Sign in"}
       </button>
 
-      <p className="mt-3 text-center text-xs text-haze-400">
+      <p className="mt-3 text-center text-xs text-bone-400">
         No account?{" "}
-        <Link href="/register" className="text-rust hover:text-rust-bright">
+        <Link href="/register" className="text-gold hover:text-gold-bright">
           Register
         </Link>
       </p>

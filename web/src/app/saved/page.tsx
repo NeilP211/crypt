@@ -32,8 +32,8 @@ export default function SavedPage() {
   if (!user) {
     return (
       <Centered>
-        <p className="text-sm text-haze-400">
-          <Link href="/login" className="text-rust hover:text-rust-bright">
+        <p className="text-sm text-bone-400">
+          <Link href="/login" className="text-gold hover:text-gold-bright">
             Sign in
           </Link>{" "}
           to see your saved locations.
@@ -44,17 +44,17 @@ export default function SavedPage() {
 
   return (
     <div className="mx-auto h-full max-w-3xl overflow-y-auto p-6">
-      <h1 className="font-mono text-lg font-semibold text-haze-200">
+      <h1 className="font-mono text-lg font-semibold text-bone-200">
         Saved locations
       </h1>
-      <p className="mt-0.5 text-xs text-haze-400">
+      <p className="mt-0.5 text-xs text-bone-400">
         {locations.length} bookmarked place{locations.length === 1 ? "" : "s"}
       </p>
 
       {pending ? (
-        <p className="mt-8 text-center text-sm text-haze-400">loading…</p>
+        <p className="mt-8 text-center text-sm text-bone-400">loading…</p>
       ) : locations.length === 0 ? (
-        <p className="mt-8 text-center text-sm text-haze-400">
+        <p className="mt-8 text-center text-sm text-bone-400">
           Nothing saved yet — run a search and tap “Save” on a result.
         </p>
       ) : (
@@ -74,15 +74,15 @@ export default function SavedPage() {
                 )}
               </div>
               <div className="min-w-0">
-                <h2 className="truncate text-sm font-semibold text-haze-200">
+                <h2 className="truncate text-sm font-semibold text-bone-200">
                   {loc.name}
                 </h2>
-                <p className="mt-0.5 text-xs text-haze-400">
+                <p className="mt-0.5 text-xs text-bone-400">
                   {titleCase(loc.structure_type)} · {titleCase(loc.era)} ·{" "}
                   {loc.lat.toFixed(4)}, {loc.lng.toFixed(4)}
                 </p>
                 {loc.description && (
-                  <p className="mt-1 line-clamp-2 text-xs text-haze-400">
+                  <p className="mt-1 line-clamp-2 text-xs text-bone-400">
                     {loc.description}
                   </p>
                 )}
