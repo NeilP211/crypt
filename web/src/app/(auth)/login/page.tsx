@@ -34,7 +34,7 @@ export default function LoginPage() {
       onSubmit={submit}
       className="w-full max-w-sm rounded-lg border border-ink-700 bg-ink-900 p-6"
     >
-      <h1 className="font-display text-lg font-semibold text-bone-200">Sign in</h1>
+      <h1 className="font-display text-lg font-semibold text-crimson">Sign in</h1>
       <p className="mt-1 text-xs text-bone-400">
         Access saved locations and contribute new sites.
       </p>

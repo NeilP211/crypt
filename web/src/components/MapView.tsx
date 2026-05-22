@@ -9,13 +9,26 @@ import maplibregl from "maplibre-gl";
 
 import type { BoundingBox, Location, ScoredLocation } from "@/lib/types";
 
-const DARK_STYLE: maplibregl.StyleSpecification = {
+// English place names (`name:en`) where available, else Latin transliteration,
+// else the local name — so labels are consistently readable, not mixed scripts.
+const ENGLISH_NAME = [
+  "coalesce",
+  ["get", "name:en"],
+  ["get", "name:latin"],
+  ["get", "name"],
+];
+
+// Minimal dark vector basemap built on OpenFreeMap (free, no API key). Only
+// water, country borders, and place labels are drawn — labels in gold to match
+// the Crypt brand, continents brightest.
+const DARK_STYLE = {
   version: 8,
+  glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
   sources: {
+    // Proven dark raster base (renders everywhere), plus a vector source used
+    // only for the gold English labels drawn on top.
     carto: {
       type: "raster",
-      // Label-free dark basemap: avoids place names rendering in mixed local
-      // scripts (Arabic, Portuguese, ...). Pins and result cards carry names.
       tiles: [
         "https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
         "https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
@@ -24,9 +37,70 @@ const DARK_STYLE: maplibregl.StyleSpecification = {
       tileSize: 256,
       attribution: "© OpenStreetMap contributors, © CARTO",
     },
+    omt: {
+      type: "vector",
+      url: "https://tiles.openfreemap.org/planet",
+      attribution: "© OpenMapTiles",
+    },
   },
-  layers: [{ id: "carto", type: "raster", source: "carto" }],
-};
+  layers: [
+    { id: "base", type: "raster", source: "carto" },
+    {
+      id: "label-city",
+      type: "symbol",
+      source: "omt",
+      "source-layer": "place",
+      minzoom: 4,
+      filter: ["match", ["get", "class"], ["city", "town", "state"], true, false],
+      layout: {
+        "text-field": ENGLISH_NAME,
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+      },
+      paint: {
+        "text-color": "#9b7a2e",
+        "text-halo-color": "#0a090b",
+        "text-halo-width": 1,
+      },
+    },
+    {
+      id: "label-country",
+      type: "symbol",
+      source: "omt",
+      "source-layer": "place",
+      filter: ["==", ["get", "class"], "country"],
+      layout: {
+        "text-field": ENGLISH_NAME,
+        "text-font": ["Noto Sans Regular"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 2, 10, 5, 14],
+      },
+      paint: {
+        "text-color": "#c79a3e",
+        "text-halo-color": "#0a090b",
+        "text-halo-width": 1,
+      },
+    },
+    {
+      id: "label-continent",
+      type: "symbol",
+      source: "omt",
+      "source-layer": "place",
+      filter: ["==", ["get", "class"], "continent"],
+      layout: {
+        "text-field": ENGLISH_NAME,
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 16,
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.25,
+      },
+      paint: {
+        "text-color": "#e6b84e",
+        "text-halo-color": "#0a090b",
+        "text-halo-width": 1.4,
+      },
+    },
+  ],
+} as maplibregl.StyleSpecification;
 
 interface MapViewProps {
   /** Ambient pins for locations in the current viewport. */

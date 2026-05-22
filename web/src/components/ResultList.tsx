@@ -35,11 +35,7 @@ export function ResultList({
     );
   }
   if (!searched) {
-    return (
-      <p className="px-1 py-6 text-center text-sm text-bone-400">
-        Upload a photo to find visually similar abandoned places.
-      </p>
-    );
+    return null;
   }
   if (results.length === 0) {
     return (

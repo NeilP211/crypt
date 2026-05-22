@@ -87,7 +87,7 @@ export default function ContributePage() {
 
   return (
     <div className="mx-auto h-full max-w-2xl overflow-y-auto p-6">
-      <h1 className="font-display text-lg font-semibold text-bone-200">
+      <h1 className="font-display text-lg font-semibold text-crimson">
         Contribute a location
       </h1>
       <p className="mt-0.5 text-xs text-bone-400">
@@ -197,7 +197,7 @@ export default function ContributePage() {
 
       {mine.length > 0 && (
         <section className="mt-6">
-          <h2 className="font-display text-sm font-semibold text-bone-200">
+          <h2 className="font-display text-sm font-semibold text-crimson">
             Your submissions
           </h2>
           <ul className="mt-2 flex flex-col gap-2">

@@ -93,7 +93,7 @@ export default function HomePage() {
     <div className="flex h-full">
       <aside className="flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-ink-700 bg-ink-950 p-4">
         <div>
-          <h1 className="font-display text-sm font-semibold text-bone-200">
+          <h1 className="font-display text-sm font-semibold text-crimson">
             Visual search
           </h1>
           <p className="mt-0.5 text-xs text-bone-400">

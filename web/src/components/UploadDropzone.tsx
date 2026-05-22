@@ -49,10 +49,7 @@ export function UploadDropzone({ onFile, disabled }: UploadDropzoneProps) {
         disabled={disabled}
         onChange={(e) => accept(e.target.files?.[0])}
       />
-      <p className="font-mono text-sm text-bone-200">Drop a photo here</p>
-      <p className="mt-1 text-xs text-bone-400">
-        or click to browse — find places that look like it
-      </p>
+      <p className="font-mono text-sm text-bone-200">Drop a photo</p>
     </div>
   );
 }
