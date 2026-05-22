@@ -14,10 +14,12 @@ const DARK_STYLE: maplibregl.StyleSpecification = {
   sources: {
     carto: {
       type: "raster",
+      // Label-free dark basemap: avoids place names rendering in mixed local
+      // scripts (Arabic, Portuguese, ...). Pins and result cards carry names.
       tiles: [
-        "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-        "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-        "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+        "https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+        "https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
       ],
       tileSize: 256,
       attribution: "© OpenStreetMap contributors, © CARTO",

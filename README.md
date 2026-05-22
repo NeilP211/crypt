@@ -185,6 +185,16 @@ Notable trade-offs are recorded as ADRs in [`docs/adr/`](docs/adr/):
 2. [MapLibre over Mapbox](docs/adr/0002-maplibre-over-mapbox.md)
 3. [In-house authentication](docs/adr/0003-in-house-auth.md)
 
+## About the dataset
+
+Crypt's locations are sourced from public data (OpenStreetMap, Wikidata) —
+abandoned, ruined, and historically interesting sites worldwide.
+
+The map skews heavily toward **North Carolina**. That's on purpose: I'm from
+NC, and the earliest version of Crypt was something I actually used to scout
+urban-exploration spots around home before opening it up to the rest of the
+world. The concentration there is a fossil of how the project started.
+
 ## Notes
 
 The AWS Terraform in `infra/` is real and `terraform validate`-clean, but is
