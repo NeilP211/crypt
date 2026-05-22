@@ -11,7 +11,7 @@ interface ResultCardProps {
   result: ScoredLocation;
   rank: number;
   selected: boolean;
-  onSelect: (id: string) => void;
+  onOpen: (result: ScoredLocation) => void;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -20,7 +20,7 @@ const STATUS_STYLES: Record<string, string> = {
   unverified: "text-bone-400 border-ink-600",
 };
 
-export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps) {
+export function ResultCard({ result, rank, selected, onOpen }: ResultCardProps) {
   const { token } = useAuth();
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -50,7 +50,7 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
 
   return (
     <article
-      onClick={() => onSelect(result.id)}
+      onClick={() => onOpen(result)}
       className={
         "flex cursor-pointer gap-3 rounded-lg border p-3 transition " +
         (selected
@@ -85,22 +85,32 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
           </span>
         </div>
 
-        <div className="mt-1 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-wide">
-          <span className="rounded border border-ink-600 px-1.5 py-0.5 text-bone-400">
-            {titleCase(result.structure_type)}
-          </span>
-          <span className="rounded border border-ink-600 px-1.5 py-0.5 text-bone-400">
-            {titleCase(result.era)}
-          </span>
-          <span
-            className={
-              "rounded border px-1.5 py-0.5 " +
-              (STATUS_STYLES[result.verified_status] ?? STATUS_STYLES.unverified)
-            }
-          >
-            {result.verified_status}
-          </span>
-        </div>
+        {(result.structure_type !== "unknown" ||
+          result.era !== "unknown" ||
+          result.verified_status !== "unverified") && (
+          <div className="mt-1 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-wide">
+            {result.structure_type !== "unknown" && (
+              <span className="rounded border border-ink-600 px-1.5 py-0.5 text-bone-400">
+                {titleCase(result.structure_type)}
+              </span>
+            )}
+            {result.era !== "unknown" && (
+              <span className="rounded border border-ink-600 px-1.5 py-0.5 text-bone-400">
+                {titleCase(result.era)}
+              </span>
+            )}
+            {result.verified_status !== "unverified" && (
+              <span
+                className={
+                  "rounded border px-1.5 py-0.5 " +
+                  (STATUS_STYLES[result.verified_status] ?? STATUS_STYLES.unverified)
+                }
+              >
+                {result.verified_status}
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="mt-2 flex items-center justify-between">
           <dl className="flex gap-3 font-mono text-[10px] text-bone-400">

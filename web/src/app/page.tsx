@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 
 import { Filters } from "@/components/Filters";
+import { LocationDetail, type DetailInfo } from "@/components/LocationDetail";
 import { MapView } from "@/components/MapView";
 import { ResultList } from "@/components/ResultList";
 import { UploadDropzone } from "@/components/UploadDropzone";
@@ -40,6 +41,7 @@ export default function HomePage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [focus, setFocus] = useState<{ lat: number; lng: number } | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [detail, setDetail] = useState<DetailInfo | null>(null);
 
   const [filters, setFilters] = useState<SearchFilters>(EMPTY_FILTERS);
   const [useLocation, setUseLocation] = useState(false);
@@ -84,15 +86,17 @@ export default function HomePage() {
     [filters, useLocation, radiusKm],
   );
 
-  const handleSelect = useCallback(
-    (id: string) => {
-      setSelectedId(id);
-      const match =
-        results.find((r) => r.id === id) ?? locations.find((l) => l.id === id);
-      if (match) setFocus({ lat: match.lat, lng: match.lng });
-    },
-    [results, locations],
-  );
+  const openDetail = useCallback((loc: DetailInfo & { id?: string }) => {
+    setDetail(loc);
+    if (loc.id) setSelectedId(loc.id);
+  }, []);
+
+  const showOnMap = useCallback((loc: DetailInfo) => {
+    if (loc.lat != null && loc.lng != null) {
+      setFocus({ lat: loc.lat, lng: loc.lng });
+    }
+    setDetail(null);
+  }, []);
 
   return (
     <div className="flex h-full">
@@ -133,7 +137,7 @@ export default function HomePage() {
           error={error}
           searched={searched}
           selectedId={selectedId}
-          onSelect={handleSelect}
+          onOpen={openDetail}
         />
       </aside>
 
@@ -142,11 +146,17 @@ export default function HomePage() {
           locations={locations}
           results={results}
           onBboxChange={handleBbox}
-          onSelect={handleSelect}
+          onOpenDetail={openDetail}
           focus={focus}
           selectedId={selectedId}
         />
       </div>
+
+      <LocationDetail
+        location={detail}
+        onClose={() => setDetail(null)}
+        onShowOnMap={showOnMap}
+      />
     </div>
   );
 }

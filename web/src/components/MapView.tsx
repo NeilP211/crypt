@@ -7,7 +7,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 
-import { titleCase } from "@/lib/format";
+import type { DetailInfo } from "./LocationDetail";
 import type { BoundingBox, Location, ScoredLocation } from "@/lib/types";
 
 // English place names (`name:en`) where available, else Latin transliteration,
@@ -46,6 +46,15 @@ const DARK_STYLE = {
   },
   layers: [
     { id: "base", type: "raster", source: "carto" },
+    // Bleed crimson over the seas and lakes for a haunted look — the vector
+    // water polygons cover the raster's dark water.
+    {
+      id: "water-blood",
+      type: "fill",
+      source: "omt",
+      "source-layer": "water",
+      paint: { "fill-color": "#5e1622", "fill-opacity": 0.92 },
+    },
     {
       id: "label-city",
       type: "symbol",
@@ -109,59 +118,10 @@ interface MapViewProps {
   /** Search results, drawn as bright ranked pins. */
   results: ScoredLocation[];
   onBboxChange?: (bbox: BoundingBox) => void;
-  onSelect?: (id: string) => void;
+  /** Open the full detail panel for a clicked location. */
+  onOpenDetail?: (loc: DetailInfo) => void;
   focus?: { lat: number; lng: number } | null;
   selectedId?: string | null;
-}
-
-const STATUS_COLOR: Record<string, string> = {
-  verified: "#54d4ba",
-  demolished: "#e0455a",
-  unverified: "#9a9285",
-};
-
-interface PopupInfo {
-  name: string;
-  structure_type: string;
-  era: string;
-  verified_status: string;
-  image_url: string;
-  description?: string;
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(
-    /[&<>"']/g,
-    (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        c
-      ] as string,
-  );
-}
-
-/** Info card shown in a popup: image (if any), name, type/era, status, lore. */
-function locationPopupHTML(loc: PopupInfo): string {
-  const image = loc.image_url
-    ? `<img src="${escapeHtml(loc.image_url)}" alt="" style="width:100%;height:96px;` +
-      `object-fit:cover;border-radius:4px;margin-bottom:6px" />`
-    : "";
-  const color = STATUS_COLOR[loc.verified_status] ?? "#9a9285";
-  const desc = (loc.description ?? "").trim();
-  const lore = desc
-    ? `<div style="color:#cfc8ba;font-size:11px;line-height:1.4;margin-top:6px">` +
-      `${escapeHtml(desc.slice(0, 180))}${desc.length > 180 ? "…" : ""}</div>`
-    : "";
-  return (
-    `<div style="width:220px">${image}` +
-    `<div style="font-weight:600;color:#ece6da;font-size:13px;line-height:1.25">` +
-    `${escapeHtml(loc.name)}</div>` +
-    `<div style="color:#9a9285;font-size:11px;margin-top:3px">` +
-    `${escapeHtml(titleCase(loc.structure_type))} · ${escapeHtml(titleCase(loc.era))}</div>` +
-    `<div style="color:${color};font-size:10px;text-transform:uppercase;` +
-    `letter-spacing:.05em;margin-top:4px">${escapeHtml(loc.verified_status)}</div>` +
-    lore +
-    `</div>`
-  );
 }
 
 function resultMarker(rank: number, selected: boolean): HTMLElement {
@@ -180,7 +140,7 @@ export function MapView({
   locations,
   results,
   onBboxChange,
-  onSelect,
+  onOpenDetail,
   focus,
   selectedId,
 }: MapViewProps) {
@@ -188,6 +148,9 @@ export function MapView({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const readyRef = useRef(false);
+  // Always call the latest handler from the once-created map listeners.
+  const onOpenDetailRef = useRef(onOpenDetail);
+  onOpenDetailRef.current = onOpenDetail;
 
   // Create the map once.
   useEffect(() => {
@@ -235,10 +198,11 @@ export function MapView({
         const feature = e.features?.[0];
         if (!feature || feature.geometry.type !== "Point") return;
         const [lng, lat] = feature.geometry.coordinates as [number, number];
-        new maplibregl.Popup({ offset: 10, closeButton: true, maxWidth: "240px" })
-          .setLngLat([lng, lat])
-          .setHTML(locationPopupHTML(feature.properties as unknown as PopupInfo))
-          .addTo(map);
+        onOpenDetailRef.current?.({
+          ...(feature.properties as unknown as DetailInfo),
+          lat,
+          lng,
+        });
       });
       map.on("mouseenter", "ambient-circles", () => {
         map.getCanvas().style.cursor = "pointer";
@@ -276,6 +240,7 @@ export function MapView({
           type: "Feature",
           geometry: { type: "Point", coordinates: [loc.lng, loc.lat] },
           properties: {
+            id: loc.id,
             name: loc.name,
             structure_type: loc.structure_type,
             era: loc.era,
@@ -297,14 +262,9 @@ export function MapView({
 
     results.forEach((result, index) => {
       const el = resultMarker(index + 1, result.id === selectedId);
-      el.addEventListener("click", () => onSelect?.(result.id));
+      el.addEventListener("click", () => onOpenDetail?.(result));
       const marker = new maplibregl.Marker({ element: el })
         .setLngLat([result.lng, result.lat])
-        .setPopup(
-          new maplibregl.Popup({ offset: 18, closeButton: true, maxWidth: "240px" }).setHTML(
-            locationPopupHTML(result),
-          ),
-        )
         .addTo(map);
       markersRef.current.push(marker);
     });
@@ -314,7 +274,7 @@ export function MapView({
       for (const r of results) bounds.extend([r.lng, r.lat]);
       map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 600 });
     }
-  }, [results, selectedId, onSelect]);
+  }, [results, selectedId, onOpenDetail]);
 
   // Fly to an externally chosen location.
   useEffect(() => {

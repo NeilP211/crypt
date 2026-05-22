@@ -9,7 +9,7 @@ interface ResultListProps {
   error: string | null;
   searched: boolean;
   selectedId: string | null;
-  onSelect: (id: string) => void;
+  onOpen: (result: ScoredLocation) => void;
 }
 
 export function ResultList({
@@ -18,7 +18,7 @@ export function ResultList({
   error,
   searched,
   selectedId,
-  onSelect,
+  onOpen,
 }: ResultListProps) {
   if (loading) {
     return (
@@ -57,7 +57,7 @@ export function ResultList({
           result={result}
           rank={index + 1}
           selected={result.id === selectedId}
-          onSelect={onSelect}
+          onOpen={onOpen}
         />
       ))}
     </div>
