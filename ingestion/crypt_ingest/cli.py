@@ -72,6 +72,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--embeddings-out", default="data/embeddings.bin", help="flat embeddings output path"
     )
+    parser.add_argument(
+        "--wikidata",
+        action="store_true",
+        help="also source from Wikidata: worldwide urbex sites + North Carolina",
+    )
+    parser.add_argument(
+        "--global-limit", type=int, default=150, help="max Wikidata worldwide sites"
+    )
+    parser.add_argument(
+        "--nc-limit", type=int, default=250, help="max Wikidata North Carolina sites"
+    )
     parser.add_argument("--skip-db", action="store_true", help="do not write to PostGIS")
     parser.add_argument(
         "--dry-run", action="store_true", help="scrape and clean only; no imagery or embeddings"
@@ -87,11 +98,21 @@ def main(argv: list[str] | None = None) -> int:
         bboxes.append(overpass.REGIONS[region])
     if args.bbox:
         bboxes.extend(args.bbox)
-    if not bboxes:
-        bboxes = [overpass.REGIONS["berlin"]]
 
-    # 1. Scrape OpenStreetMap.
     raw: list = []
+
+    # 1a. Wikidata: worldwide urbex sites + a North Carolina concentration.
+    if args.wikidata:
+        from . import wikidata
+
+        print("querying Wikidata (worldwide urbex)...", file=sys.stderr)
+        raw.extend(wikidata.fetch_global(args.global_limit))
+        print("querying Wikidata (North Carolina)...", file=sys.stderr)
+        raw.extend(wikidata.fetch_in_bbox(*wikidata.NORTH_CAROLINA_BBOX, limit=args.nc_limit))
+
+    # 1b. OpenStreetMap. Default to Berlin only if no source was specified.
+    if not bboxes and not args.wikidata:
+        bboxes = [overpass.REGIONS["berlin"]]
     for bbox in bboxes:
         print(f"scraping Overpass for bbox {bbox} ...", file=sys.stderr)
         elements = overpass.fetch(bbox)
