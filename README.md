@@ -12,6 +12,10 @@ country, ranked by visual similarity, distance, and lore.
 [![CI](https://github.com/NeilP211/crypt/actions/workflows/ci.yml/badge.svg)](https://github.com/NeilP211/crypt/actions/workflows/ci.yml)
 &nbsp;·&nbsp; Rust · Next.js · PostGIS · CLIP · AWS
 
+<br />
+
+<img src="docs/images/demo.gif" alt="Crypt demo: drop a photo, get ranked haunted places on the map" width="840" />
+
 </div>
 
 ---
@@ -42,6 +46,18 @@ Rust**. The pieces:
   caching, and Prometheus metrics.
 - A **Next.js + MapLibre** map frontend with drag-and-drop image search.
 - Full **Terraform** AWS topology and a one-command local stack.
+
+## Screenshots
+
+<img src="docs/images/app-search.png" alt="Visual search results" width="100%" />
+
+Drop a photo and Crypt returns ranked matches: numbered pins on the map and
+scored results in the sidebar, blending visual similarity, distance, and lore.
+
+| | |
+|:--|:--|
+| <img src="docs/images/app-detail.png" alt="Location detail panel" /> | <img src="docs/images/app-map.png" alt="Full-bleed haunted map" /> |
+| Every place opens a detail card with a category illustration, the recorded haunting, and links to dig deeper. | Collapse the panel for a full-bleed map: gold gothic labels, crimson water, and teal location pins. |
 
 ## Highlights
 
