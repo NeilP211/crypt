@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
 
 import requests
 
@@ -29,22 +30,35 @@ def _parse_bbox(raw: str) -> tuple[float, float, float, float]:
     return parts[0], parts[1], parts[2], parts[3]
 
 
-def _download(session: requests.Session, url: str, max_bytes: int = 8_000_000) -> bytes | None:
-    """Download an image, returning `None` on any failure or non-image body."""
-    try:
-        response = session.get(
-            url,
-            timeout=30,
-            headers={"User-Agent": "crypt-ingest/0.1 (+https://github.com/NeilP211/crypt)"},
-        )
-        response.raise_for_status()
-    except requests.RequestException:
-        return None
-    if "image" not in response.headers.get("content-type", ""):
-        return None
-    if len(response.content) > max_bytes:
-        return None
-    return response.content
+def _download(
+    session: requests.Session,
+    url: str,
+    max_bytes: int = 8_000_000,
+    retries: int = 3,
+) -> bytes | None:
+    """Download an image, returning `None` on failure or a non-image body.
+
+    Retries with a backoff on rate-limit (429) and transient errors, since
+    bulk image fetches from Wikimedia Commons get throttled otherwise.
+    """
+    headers = {"User-Agent": "crypt-ingest/0.1 (+https://github.com/NeilP211/crypt)"}
+    for attempt in range(retries):
+        try:
+            response = session.get(url, timeout=30, headers=headers)
+        except requests.RequestException:
+            time.sleep(0.5 * (attempt + 1))
+            continue
+        if response.status_code == 429:
+            time.sleep(1.0 * (attempt + 1))
+            continue
+        if not response.ok:
+            return None
+        if "image" not in response.headers.get("content-type", ""):
+            return None
+        if len(response.content) > max_bytes:
+            return None
+        return response.content
+    return None
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -108,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
         print("querying Wikidata (worldwide urbex)...", file=sys.stderr)
         raw.extend(wikidata.fetch_global(args.global_limit))
         print("querying Wikidata (North Carolina)...", file=sys.stderr)
-        raw.extend(wikidata.fetch_in_bbox(*wikidata.NORTH_CAROLINA_BBOX, limit=args.nc_limit))
+        raw.extend(wikidata.fetch_north_carolina(limit=args.nc_limit))
 
     # 1b. OpenStreetMap. Default to Berlin only if no source was specified.
     if not bboxes and not args.wikidata:
@@ -143,6 +157,7 @@ def main(argv: list[str] | None = None) -> int:
     for loc in candidates:
         url = imagery.resolve_image_url(loc.image_tag)
         data = _download(session, url) if url else None
+        time.sleep(0.12)  # be polite to image hosts; avoids bulk-fetch throttling
         if data is None:
             continue
         try:

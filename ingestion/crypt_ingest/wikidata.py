@@ -144,3 +144,15 @@ SELECT ?item ?itemLabel ?lat ?lon ?image WHERE {{
 # North Carolina bounding box (south, west, north, east); the west/south
 # edges are kept just inside the state line to exclude Atlanta.
 NORTH_CAROLINA_BBOX = (33.85, -84.1, 36.6, -75.4)
+
+
+def _in_north_carolina(loc: RawLocation) -> bool:
+    """Keep points on the NC side of the diagonal state line: the bbox's SW
+    corner otherwise clips metro Atlanta and upstate South Carolina."""
+    return loc.lat >= 35.0 or loc.lng >= -80.5
+
+
+def fetch_north_carolina(limit: int = 250) -> list[RawLocation]:
+    """Image-backed historic structures in North Carolina."""
+    candidates = fetch_in_bbox(*NORTH_CAROLINA_BBOX, limit=limit)
+    return [loc for loc in candidates if _in_north_carolina(loc)]
