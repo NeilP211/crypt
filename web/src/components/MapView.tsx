@@ -24,7 +24,9 @@ const ENGLISH_NAME = [
 // the Crypt brand, continents brightest.
 const DARK_STYLE = {
   version: 8,
-  glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  // Pirata One SDF glyphs generated locally and served from public/fonts, so
+  // the map labels wear the same gothic blackletter as the rest of the UI.
+  glyphs: "/fonts/{fontstack}/{range}.pbf",
   sources: {
     // Proven dark raster base (renders everywhere), plus a vector source used
     // only for the gold English labels drawn on top.
@@ -64,7 +66,7 @@ const DARK_STYLE = {
       filter: ["match", ["get", "class"], ["city", "town", "state"], true, false],
       layout: {
         "text-field": ENGLISH_NAME,
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["PirataOne"],
         "text-size": 11,
       },
       paint: {
@@ -81,7 +83,7 @@ const DARK_STYLE = {
       filter: ["==", ["get", "class"], "country"],
       layout: {
         "text-field": ENGLISH_NAME,
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["PirataOne"],
         "text-size": ["interpolate", ["linear"], ["zoom"], 2, 10, 5, 14],
       },
       paint: {
@@ -98,7 +100,7 @@ const DARK_STYLE = {
       filter: ["==", ["get", "class"], "continent"],
       layout: {
         "text-field": ENGLISH_NAME,
-        "text-font": ["Noto Sans Bold"],
+        "text-font": ["PirataOne"],
         "text-size": 16,
         "text-transform": "uppercase",
         "text-letter-spacing": 0.25,
