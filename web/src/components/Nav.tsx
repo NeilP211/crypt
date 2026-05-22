@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
 import { InfoTip } from "./InfoTip";
+import { spookyAudio } from "@/lib/audio";
 import { useAuth } from "@/lib/auth";
 
 export function Nav() {
@@ -30,6 +32,7 @@ export function Nav() {
         <NavLink href="/">Map</NavLink>
         {user && <NavLink href="/saved">Saved</NavLink>}
         {user && <NavLink href="/contribute">Contribute</NavLink>}
+        <SoundToggle />
 
         {!loading && user && (
           <div className="ml-3 flex items-center gap-3 border-l border-ink-700 pl-3">
@@ -63,6 +66,45 @@ export function Nav() {
         )}
       </nav>
     </header>
+  );
+}
+
+function SoundToggle() {
+  const [on, setOn] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void spookyAudio.toggle().then(setOn);
+      }}
+      aria-label={on ? "Turn ambient sound off" : "Turn ambient sound on"}
+      title={on ? "Ambient sound on" : "Ambient sound off"}
+      className={
+        "ml-1 rounded p-1.5 transition " +
+        (on ? "text-teal-bright" : "text-bone-400 hover:text-bone-200")
+      }
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M11 5 6 9H2v6h4l5 4z" />
+        {on ? (
+          <>
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+          </>
+        ) : (
+          <path d="M22 9l-6 6M16 9l6 6" />
+        )}
+      </svg>
+    </button>
   );
 }
 

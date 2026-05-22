@@ -9,6 +9,7 @@ import { MapView } from "@/components/MapView";
 import { ResultList } from "@/components/ResultList";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { api, ApiError } from "@/lib/api";
+import { spookyAudio } from "@/lib/audio";
 import type { BoundingBox, Location, ScoredLocation } from "@/lib/types";
 
 function currentPosition(): Promise<{ lat: number; lng: number } | undefined> {
@@ -89,6 +90,7 @@ export default function HomePage() {
   const openDetail = useCallback((loc: DetailInfo & { id?: string }) => {
     setDetail(loc);
     if (loc.id) setSelectedId(loc.id);
+    spookyAudio.playCategory(categoryOf(loc.name, loc.structure_type));
   }, []);
 
   const showOnMap = useCallback((loc: DetailInfo) => {
