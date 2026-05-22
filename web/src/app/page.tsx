@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { Filters } from "@/components/Filters";
 import { MapView } from "@/components/MapView";
@@ -45,11 +45,16 @@ export default function HomePage() {
   const [useLocation, setUseLocation] = useState(false);
   const [radiusKm, setRadiusKm] = useState(50);
 
+  const bboxTimer = useRef<ReturnType<typeof setTimeout>>();
   const handleBbox = useCallback((bbox: BoundingBox) => {
-    api
-      .locationsInView(bbox)
-      .then(setLocations)
-      .catch(() => setLocations([]));
+    // Debounce: only fetch once panning/zooming settles.
+    if (bboxTimer.current) clearTimeout(bboxTimer.current);
+    bboxTimer.current = setTimeout(() => {
+      api
+        .locationsInView(bbox)
+        .then(setLocations)
+        .catch(() => setLocations([]));
+    }, 250);
   }, []);
 
   const runSearch = useCallback(

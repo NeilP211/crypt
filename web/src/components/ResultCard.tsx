@@ -66,8 +66,8 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-bone-400">
-            no image
+          <div className="flex h-full w-full items-center justify-center bg-ink-800 font-display text-2xl text-bone-600">
+            ⌂
           </div>
         )}
         <span className="absolute left-0 top-0 flex h-5 w-5 items-center justify-center bg-crimson text-xs font-bold text-bone-200">
@@ -138,6 +138,11 @@ export function ResultCard({ result, rank, selected, onSelect }: ResultCardProps
             {saved ? "Saved" : "Save"}
           </button>
         </div>
+        {result.description && (
+          <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-bone-400">
+            {result.description}
+          </p>
+        )}
         {error && <p className="mt-1 text-[10px] text-demolished">{error}</p>}
       </div>
     </article>

@@ -114,19 +114,20 @@ interface MapViewProps {
   selectedId?: string | null;
 }
 
-function ambientMarker(): HTMLElement {
-  const el = document.createElement("div");
-  el.className =
-    "h-3 w-3 cursor-pointer rounded-full border border-ink-950 bg-teal/70 " +
-    "shadow transition hover:scale-150 hover:bg-teal";
-  return el;
-}
-
 const STATUS_COLOR: Record<string, string> = {
   verified: "#54d4ba",
   demolished: "#e0455a",
   unverified: "#9a9285",
 };
+
+interface PopupInfo {
+  name: string;
+  structure_type: string;
+  era: string;
+  verified_status: string;
+  image_url: string;
+  description?: string;
+}
 
 function escapeHtml(value: string): string {
   return value.replace(
@@ -138,21 +139,27 @@ function escapeHtml(value: string): string {
   );
 }
 
-/** Info card shown in a marker's popup: image, name, type/era, status. */
-function locationPopupHTML(loc: Location): string {
+/** Info card shown in a popup: image (if any), name, type/era, status, lore. */
+function locationPopupHTML(loc: PopupInfo): string {
   const image = loc.image_url
     ? `<img src="${escapeHtml(loc.image_url)}" alt="" style="width:100%;height:96px;` +
       `object-fit:cover;border-radius:4px;margin-bottom:6px" />`
     : "";
   const color = STATUS_COLOR[loc.verified_status] ?? "#9a9285";
+  const desc = (loc.description ?? "").trim();
+  const lore = desc
+    ? `<div style="color:#cfc8ba;font-size:11px;line-height:1.4;margin-top:6px">` +
+      `${escapeHtml(desc.slice(0, 180))}${desc.length > 180 ? "…" : ""}</div>`
+    : "";
   return (
-    `<div style="width:210px">${image}` +
+    `<div style="width:220px">${image}` +
     `<div style="font-weight:600;color:#ece6da;font-size:13px;line-height:1.25">` +
     `${escapeHtml(loc.name)}</div>` +
     `<div style="color:#9a9285;font-size:11px;margin-top:3px">` +
     `${escapeHtml(titleCase(loc.structure_type))} · ${escapeHtml(titleCase(loc.era))}</div>` +
     `<div style="color:${color};font-size:10px;text-transform:uppercase;` +
     `letter-spacing:.05em;margin-top:4px">${escapeHtml(loc.verified_status)}</div>` +
+    lore +
     `</div>`
   );
 }
@@ -207,6 +214,40 @@ export function MapView({
       });
     };
     map.on("load", () => {
+      // Ambient location dots as a GPU-rendered circle layer — scales to
+      // thousands of points without the pan/zoom lag of DOM markers.
+      map.addSource("ambient", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "ambient-circles",
+        type: "circle",
+        source: "ambient",
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 2, 2.5, 8, 5.5],
+          "circle-color": "#36b39a",
+          "circle-opacity": 0.8,
+          "circle-stroke-color": "#0a090b",
+          "circle-stroke-width": 1,
+        },
+      });
+      map.on("click", "ambient-circles", (e) => {
+        const feature = e.features?.[0];
+        if (!feature || feature.geometry.type !== "Point") return;
+        const [lng, lat] = feature.geometry.coordinates as [number, number];
+        new maplibregl.Popup({ offset: 10, closeButton: true, maxWidth: "240px" })
+          .setLngLat([lng, lat])
+          .setHTML(locationPopupHTML(feature.properties as unknown as PopupInfo))
+          .addTo(map);
+      });
+      map.on("mouseenter", "ambient-circles", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "ambient-circles", () => {
+        map.getCanvas().style.cursor = "";
+      });
+
       readyRef.current = true;
       emitBbox();
     });
@@ -222,27 +263,38 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Redraw markers whenever locations or results change.
+  // Feed ambient locations (minus the current results) into the circle layer.
+  useEffect(() => {
+    const map = mapRef.current;
+    const source = map?.getSource("ambient") as maplibregl.GeoJSONSource | undefined;
+    if (!map || !source) return;
+    const resultIds = new Set(results.map((r) => r.id));
+    source.setData({
+      type: "FeatureCollection",
+      features: locations
+        .filter((loc) => !resultIds.has(loc.id))
+        .map((loc) => ({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [loc.lng, loc.lat] },
+          properties: {
+            name: loc.name,
+            structure_type: loc.structure_type,
+            era: loc.era,
+            verified_status: loc.verified_status,
+            image_url: loc.image_url,
+            description: loc.description,
+          },
+        })),
+    });
+  }, [locations, results]);
+
+  // Search results as DOM markers (few, ranked, individually interactive).
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     for (const marker of markersRef.current) marker.remove();
     markersRef.current = [];
-
-    const resultIds = new Set(results.map((r) => r.id));
-    for (const loc of locations) {
-      if (resultIds.has(loc.id)) continue;
-      const marker = new maplibregl.Marker({ element: ambientMarker() })
-        .setLngLat([loc.lng, loc.lat])
-        .setPopup(
-          new maplibregl.Popup({ offset: 12, closeButton: true, maxWidth: "240px" }).setHTML(
-            locationPopupHTML(loc),
-          ),
-        )
-        .addTo(map);
-      markersRef.current.push(marker);
-    }
 
     results.forEach((result, index) => {
       const el = resultMarker(index + 1, result.id === selectedId);
@@ -258,13 +310,12 @@ export function MapView({
       markersRef.current.push(marker);
     });
 
-    // Frame the result set.
     if (results.length > 0) {
       const bounds = new maplibregl.LngLatBounds();
       for (const r of results) bounds.extend([r.lng, r.lat]);
       map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 600 });
     }
-  }, [locations, results, selectedId, onSelect]);
+  }, [results, selectedId, onSelect]);
 
   // Fly to an externally chosen location.
   useEffect(() => {
