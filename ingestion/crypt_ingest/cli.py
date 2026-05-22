@@ -58,7 +58,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="a named region to scrape (repeatable)",
     )
     parser.add_argument(
-        "--bbox", type=_parse_bbox, help="explicit bounding box 'south,west,north,east'"
+        "--bbox",
+        type=_parse_bbox,
+        action="append",
+        help="explicit bounding box 'south,west,north,east' (repeatable)",
     )
     parser.add_argument(
         "--limit", type=int, default=0, help="cap locations processed (0 = no cap)"
@@ -83,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
     for region in args.region or []:
         bboxes.append(overpass.REGIONS[region])
     if args.bbox:
-        bboxes.append(args.bbox)
+        bboxes.extend(args.bbox)
     if not bboxes:
         bboxes = [overpass.REGIONS["berlin"]]
 
