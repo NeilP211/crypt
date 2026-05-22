@@ -53,7 +53,7 @@ const DARK_STYLE = {
       type: "fill",
       source: "omt",
       "source-layer": "water",
-      paint: { "fill-color": "#3f0a12", "fill-opacity": 0.95 },
+      paint: { "fill-color": "#5e1622", "fill-opacity": 0.92 },
     },
     {
       id: "label-city",

@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
 import { Nav } from "@/components/Nav";
+import { SpookyOverlay } from "@/components/SpookyOverlay";
 import { AuthProvider } from "@/lib/auth";
 
 // A haunted, weathered type system: Pirata One (gothic blackletter) for the
@@ -40,6 +41,7 @@ export default function RootLayout({
         <AuthProvider>
           <Nav />
           <main className="flex-1 overflow-hidden">{children}</main>
+          <SpookyOverlay />
         </AuthProvider>
       </body>
     </html>

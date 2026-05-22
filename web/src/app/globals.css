@@ -15,6 +15,42 @@ body {
   @apply bg-ink-950 text-bone-200 antialiased;
 }
 
+/* Drifting spooks (ghosts, bats, a witch) across the viewport. */
+@keyframes spook-drift-left {
+  from {
+    transform: translateX(112vw);
+  }
+  to {
+    transform: translateX(-18vw);
+  }
+}
+@keyframes spook-drift-right {
+  from {
+    transform: translateX(-18vw);
+  }
+  to {
+    transform: translateX(112vw);
+  }
+}
+@keyframes spook-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+.spook {
+  position: absolute;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spook {
+    display: none;
+  }
+}
+
 /* Theme the MapLibre controls and popups to match the dark palette. */
 .maplibregl-popup-content {
   @apply rounded border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-bone-200 shadow-lg;

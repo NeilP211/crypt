@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { CategoryGraphic } from "./HauntedGraphics";
 import { formatDistance, titleCase } from "@/lib/format";
 
 export interface DetailInfo {
@@ -21,42 +22,6 @@ const STATUS_STYLE: Record<string, string> = {
   demolished: "border-demolished/40 text-demolished",
   unverified: "border-ink-600 text-bone-400",
 };
-
-/** A stylized haunted-house graphic shown when a location has no photo. */
-function HauntedGraphic() {
-  return (
-    <svg viewBox="0 0 240 140" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <radialGradient id="glow" cx="50%" cy="38%" r="65%">
-          <stop offset="0%" stopColor="#bf2f43" stopOpacity="0.55" />
-          <stop offset="60%" stopColor="#5e1622" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#0a090b" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <rect width="240" height="140" fill="#0a090b" />
-      <rect width="240" height="140" fill="url(#glow)" />
-      <circle cx="158" cy="42" r="18" fill="#7d1d2b" opacity="0.9" />
-      {/* bare tree */}
-      <g stroke="#070708" strokeWidth="2.5" fill="none">
-        <path d="M40 132 V86 M40 100 L28 90 M40 96 L52 84 M40 110 L30 104" />
-      </g>
-      {/* house silhouette */}
-      <g fill="#070708">
-        <polygon points="92,132 92,74 122,52 152,74 152,132" />
-        <polygon points="88,76 122,50 156,76 122,50" stroke="#070708" strokeWidth="6" />
-        <rect x="128" y="40" width="7" height="20" />
-        <rect x="116" y="108" width="14" height="24" />
-      </g>
-      {/* glowing windows */}
-      <g fill="#36b39a" opacity="0.9">
-        <rect x="100" y="84" width="9" height="11" />
-        <rect x="135" y="84" width="9" height="11" />
-        <rect x="119" y="64" width="8" height="9" fill="#54d4ba" />
-      </g>
-      <rect y="130" width="240" height="10" fill="#070708" />
-    </svg>
-  );
-}
 
 interface LocationDetailProps {
   location: DetailInfo | null;
@@ -115,7 +80,7 @@ export function LocationDetail({ location, onClose, onShowOnMap }: LocationDetai
               className="h-full w-full object-cover"
             />
           ) : (
-            <HauntedGraphic />
+            <CategoryGraphic structureType={location.structure_type} />
           )}
         </div>
 
