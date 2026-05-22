@@ -53,6 +53,33 @@ def test_parse_rows_skips_rows_without_name_or_coords():
     assert haunted.parse_rows(rows) == []
 
 
+def test_weight_by_state_boosts_one_state_and_caps_others():
+    def make(state, count):
+        return [
+            RawLocation(
+                source_id=f"{state}{i}",
+                name=f"{state} {i}",
+                description="",
+                lat=1.0,
+                lng=2.0,
+                era="unknown",
+                structure_type="unknown",
+                image_tag=None,
+                tags={"state": state},
+            )
+            for i in range(count)
+        ]
+
+    pool = make("North Carolina", 50) + make("California", 100) + make("Ohio", 5)
+    kept = haunted.weight_by_state(pool, "North Carolina", per_state_cap=10)
+    from collections import Counter
+
+    counts = Counter(loc.tags["state"] for loc in kept)
+    assert counts["North Carolina"] == 50  # boosted: kept in full
+    assert counts["California"] == 10  # capped
+    assert counts["Ohio"] == 5  # below cap: kept all
+
+
 def test_caption_leads_with_name_and_place_and_truncates():
     loc = RawLocation(
         source_id="x",

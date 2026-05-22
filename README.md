@@ -2,11 +2,10 @@
 
 # Crypt
 
-**Geospatial visual search for urban exploration.**
+**Haunted places & urban exploration — geospatial visual search.**
 
-Upload a photo of a place you like — get visually similar abandoned and
-historic locations near you, ranked by image similarity, distance, and
-metadata.
+Upload a photo — uncover haunted, abandoned, and forgotten places across the
+country, ranked by visual similarity, distance, and lore.
 
 [![CI](https://github.com/NeilP211/crypt/actions/workflows/ci.yml/badge.svg)](https://github.com/NeilP211/crypt/actions/workflows/ci.yml)
 &nbsp;·&nbsp; Rust · Next.js · PostGIS · CLIP · AWS
@@ -17,11 +16,11 @@ metadata.
 
 ## Why
 
-Location discovery for urban exploration is gatekept — scattered across
-private forums, Discord servers, and word of mouth — and the tooling that
-does exist is poor. Crypt is the search engine I wanted: point it at a photo
-of an abandoned factory and it finds you the visually similar ones nearby,
-with era, structure type, and last-verified status attached.
+Discovery for haunted spots and urban-exploration sites is gatekept —
+scattered across private forums, Discord servers, and word of mouth — and the
+tooling that exists is poor. Crypt is the search engine I wanted: point it at
+a photo and it surfaces the eerily similar places, with location, type, and
+the story behind each one.
 
 ## What it is
 
@@ -30,8 +29,9 @@ Rust**. The pieces:
 
 - A custom **HNSW** approximate-nearest-neighbor index — the hero component —
   benchmarked against exact kNN.
-- **CLIP** image embeddings over real **OpenStreetMap** abandoned/historic
-  locations.
+- **CLIP** embeddings over thousands of haunted/abandoned locations. CLIP is
+  multimodal — image and text share one embedding space — so the index can be
+  built from location *descriptions* and still answer *photo* queries.
 - A **PostGIS** geospatial layer for radius, bounding-box, and distance
   queries.
 - **Hybrid ranking** that blends vector similarity, geographic proximity, and
@@ -131,9 +131,10 @@ Requires Docker.
 #    web, OTel Collector, Prometheus, Grafana).
 make up
 
-# 2. Ingest real data: scrape OpenStreetMap, embed with CLIP,
-#    build the index. (Downloads the CLIP model on first run.)
-make ingest REGION=berlin LIMIT=800
+# 2. Load data: download the Haunted Places dataset, embed each location's
+#    description with CLIP, build the index. (Downloads the CLIP model and,
+#    via the Kaggle CLI, the dataset on first run.)
+make ingest
 ```
 
 Then open:
@@ -145,8 +146,9 @@ Then open:
 | http://localhost:9090 | Prometheus |
 | http://localhost:3001 | Grafana (service-overview dashboard) |
 
-Available regions: `berlin`, `detroit`, `paris`, `nyc`, `london`, `rome` —
-or pass `--bbox`.
+`make ingest` defaults to keeping all of North Carolina and capping other
+states (`--boost-state`, `--per-state-cap`). For image-backed places from
+OpenStreetMap + Wikidata instead, use `make ingest-osm`.
 
 ## Repository layout
 
@@ -187,13 +189,25 @@ Notable trade-offs are recorded as ADRs in [`docs/adr/`](docs/adr/):
 
 ## About the dataset
 
-Crypt's locations are sourced from public data (OpenStreetMap, Wikidata) —
-abandoned, ruined, and historically interesting sites worldwide.
+Crypt is loaded from the **Shadowlands Haunted Places Index** (via the
+[Kaggle dataset](https://www.kaggle.com/datasets/sujaykapadnis/haunted-places)) —
+~11k reported haunted and abandoned US locations: asylums, cemeteries, old
+houses, ghost towns, mills, and ruins, each with coordinates and a written
+account of its haunting. The ingestion pipeline also supports OpenStreetMap and
+Wikidata sources (`--wikidata`) for image-backed places worldwide.
 
-The map skews heavily toward **North Carolina**. That's on purpose: I'm from
-NC, and the earliest version of Crypt was something I actually used to scout
-urban-exploration spots around home before opening it up to the rest of the
-world. The concentration there is a fossil of how the project started.
+**Why a photo can search text.** The haunted dataset has descriptions, not
+photos. Because CLIP encodes images and text into the *same* embedding space,
+Crypt embeds each location's caption with CLIP's text encoder and your uploaded
+photo with its image encoder — and compares them directly. So "visual search"
+becomes "find places whose story matches what your photo looks like." The HNSW
+index, PostGIS layer, and hybrid ranking are all unchanged.
+
+**The North Carolina bias is intentional.** The ingest keeps every NC location
+and caps every other state (`--boost-state`), so NC is the densest cluster on
+the map. I'm from NC, and the earliest version of Crypt was something I used to
+scout spots around home before opening it up to the rest of the country — the
+concentration is a fossil of how the project started.
 
 ## Notes
 

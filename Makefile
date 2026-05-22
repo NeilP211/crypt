@@ -1,11 +1,10 @@
 # Crypt — developer task runner.
 # `make up` boots the whole stack; `make ingest` populates real data.
 
-COMPOSE := docker compose -f deploy/docker-compose.yml
-REGION  ?= berlin
-LIMIT   ?= 800
+COMPOSE      := docker compose -f deploy/docker-compose.yml
+HAUNTED_CSV  ?= data/haunted_places.csv
 
-.PHONY: help up down logs ps ingest bench test fmt lint clean
+.PHONY: help up down logs ps ingest ingest-osm bench test fmt lint clean
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -24,9 +23,17 @@ logs: ## Tail logs from every service
 ps: ## Show service status
 	$(COMPOSE) ps
 
-ingest: ## Scrape OSM, embed with CLIP, build the index (REGION=, LIMIT=)
+ingest: ## Load Haunted Places (downloads from Kaggle), embed, build index
+	@test -f $(HAUNTED_CSV) || kaggle datasets download -d sujaykapadnis/haunted-places --unzip -p data
 	$(COMPOSE) exec -T embed python -m crypt_ingest.cli \
-		--region $(REGION) --limit $(LIMIT) \
+		--haunted /app/data/haunted_places.csv \
+		--dsn postgres://crypt:crypt@postgres:5432/crypt \
+		--embeddings-out /app/data/embeddings.bin
+	$(COMPOSE) exec -T server build-index /app/data/embeddings.bin /app/data/crypt.index
+	$(COMPOSE) restart server
+
+ingest-osm: ## Alternative: image-backed places from OSM + Wikidata
+	$(COMPOSE) exec -T embed python -m crypt_ingest.cli --wikidata \
 		--dsn postgres://crypt:crypt@postgres:5432/crypt \
 		--embeddings-out /app/data/embeddings.bin
 	$(COMPOSE) exec -T server build-index /app/data/embeddings.bin /app/data/crypt.index

@@ -108,6 +108,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--text-batch", type=int, default=256, help="caption embedding batch size"
     )
+    parser.add_argument(
+        "--boost-state",
+        default="North Carolina",
+        help="Haunted Places: keep this state in full (empty string to disable)",
+    )
+    parser.add_argument(
+        "--per-state-cap",
+        type=int,
+        default=30,
+        help="Haunted Places: max locations per non-boosted state",
+    )
     parser.add_argument("--skip-db", action="store_true", help="do not write to PostGIS")
     parser.add_argument(
         "--dry-run", action="store_true", help="scrape and clean only; no imagery or embeddings"
@@ -124,8 +135,17 @@ def run_haunted(args: argparse.Namespace) -> int:
 
     raw = haunted.load(args.haunted)
     cleaned = clean.clean(raw)
-    print(f"loaded {len(raw)} -> cleaned {len(cleaned)} haunted places", file=sys.stderr)
-    records = cleaned[: args.limit] if args.limit else cleaned
+    weighted = (
+        haunted.weight_by_state(cleaned, args.boost_state, args.per_state_cap)
+        if args.boost_state
+        else cleaned
+    )
+    print(
+        f"loaded {len(raw)} -> cleaned {len(cleaned)} -> weighted {len(weighted)} "
+        f"haunted places",
+        file=sys.stderr,
+    )
+    records = weighted[: args.limit] if args.limit else weighted
     if not records:
         print("no usable rows in the CSV", file=sys.stderr)
         return 1

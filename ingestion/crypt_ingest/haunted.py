@@ -10,6 +10,7 @@ state, state_abbrev, longitude, latitude, city_longitude, city_latitude.
 from __future__ import annotations
 
 import csv
+import random
 
 from .model import RawLocation
 from .wikidata import classify_structure
@@ -74,3 +75,26 @@ def load(path: str) -> list[RawLocation]:
     with open(path, encoding="utf-8", errors="replace", newline="") as handle:
         rows = list(csv.DictReader(handle))
     return parse_rows(rows)
+
+
+def weight_by_state(
+    locations: list[RawLocation],
+    boost_state: str = "North Carolina",
+    per_state_cap: int = 30,
+    seed: int = 42,
+) -> list[RawLocation]:
+    """Keep the boost state's locations in full and cap every other state, so
+    one state stays the densest cluster while the whole country is covered.
+    Deterministic given `seed`."""
+    by_state: dict[str, list[RawLocation]] = {}
+    for loc in locations:
+        by_state.setdefault(loc.tags.get("state", ""), []).append(loc)
+
+    rng = random.Random(seed)
+    kept: list[RawLocation] = []
+    for state, group in by_state.items():
+        if state == boost_state or len(group) <= per_state_cap:
+            kept.extend(group)
+        else:
+            kept.extend(rng.sample(group, per_state_cap))
+    return kept
