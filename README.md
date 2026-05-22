@@ -1,10 +1,12 @@
 <div align="center">
 
+<img src="docs/images/crypt-logo.png" alt="Crypt" width="116" height="116" />
+
 # Crypt
 
-**Haunted places & urban exploration — geospatial visual search.**
+**Haunted places and urban exploration, by geospatial visual search.**
 
-Upload a photo — uncover haunted, abandoned, and forgotten places across the
+Upload a photo and uncover haunted, abandoned, and forgotten places across the
 country, ranked by visual similarity, distance, and lore.
 
 [![CI](https://github.com/NeilP211/crypt/actions/workflows/ci.yml/badge.svg)](https://github.com/NeilP211/crypt/actions/workflows/ci.yml)
@@ -84,9 +86,11 @@ and distance → hybrid re-ranking → cached JSON. See
 ## The hero: a from-scratch HNSW index
 
 The `hnsw` crate implements the Hierarchical Navigable Small World algorithm
-end to end — the layered proximity graph, the greedy layer descent, the
-best-first beam search, and the neighbor-selection heuristic — with **no
+end to end: the layered proximity graph, the greedy layer descent, the
+best-first beam search, and the neighbor-selection heuristic, with **no
 third-party ANN dependency**.
+
+![Recall vs latency frontier, and Crypt HNSW vs FAISS at matched parameters](docs/images/hnsw-benchmark.png)
 
 Recall is measured against **brute-force exact kNN**, a stricter reference
 than comparing two approximate libraries. At 100k clustered 128-d vectors
