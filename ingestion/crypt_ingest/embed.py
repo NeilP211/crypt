@@ -35,6 +35,7 @@ class Embedder:
             model_name, pretrained=pretrained
         )
         self.model = self.model.eval().to(self.device)
+        self.tokenizer = open_clip.get_tokenizer(model_name)
         self.dim = int(getattr(self.model.visual, "output_dim", 512))
 
     def embed_images(self, images: list) -> np.ndarray:
@@ -53,3 +54,18 @@ class Embedder:
 
         image = Image.open(io.BytesIO(data))
         return self.embed_images([image])[0]
+
+    def embed_texts(self, texts: list[str]) -> np.ndarray:
+        """Embed a batch of captions with CLIP's text encoder.
+
+        CLIP image and text embeddings share one space, so these vectors are
+        directly comparable to image embeddings — letting a photo query match
+        text-described locations. Captions over CLIP's 77-token limit are
+        truncated by the tokenizer.
+        """
+        torch = self._torch
+        tokens = self.tokenizer(texts).to(self.device)
+        with torch.no_grad():
+            features = self.model.encode_text(tokens)
+            features = features / features.norm(dim=-1, keepdim=True)
+        return features.cpu().numpy().astype("float32")

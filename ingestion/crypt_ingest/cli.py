@@ -100,6 +100,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--nc-limit", type=int, default=250, help="max Wikidata North Carolina sites"
     )
+    parser.add_argument(
+        "--haunted",
+        metavar="CSV",
+        help="ingest the Shadowlands Haunted Places CSV (CLIP text embeddings)",
+    )
+    parser.add_argument(
+        "--text-batch", type=int, default=256, help="caption embedding batch size"
+    )
     parser.add_argument("--skip-db", action="store_true", help="do not write to PostGIS")
     parser.add_argument(
         "--dry-run", action="store_true", help="scrape and clean only; no imagery or embeddings"
@@ -107,8 +115,58 @@ def build_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def run_haunted(args: argparse.Namespace) -> int:
+    """Ingest the Haunted Places CSV using CLIP text embeddings of each
+    location's caption (name + place + description)."""
+    import numpy as np
+
+    from . import haunted
+
+    raw = haunted.load(args.haunted)
+    cleaned = clean.clean(raw)
+    print(f"loaded {len(raw)} -> cleaned {len(cleaned)} haunted places", file=sys.stderr)
+    records = cleaned[: args.limit] if args.limit else cleaned
+    if not records:
+        print("no usable rows in the CSV", file=sys.stderr)
+        return 1
+
+    from .embed import Embedder
+
+    embedder = Embedder()
+    captions = [haunted.caption(r) for r in records]
+    batches = []
+    for start in range(0, len(captions), args.text_batch):
+        chunk = captions[start : start + args.text_batch]
+        batches.append(embedder.embed_texts(chunk))
+        print(f"  embedded {start + len(chunk)}/{len(captions)} captions", file=sys.stderr)
+    matrix = np.vstack(batches)
+
+    for index, record in enumerate(records):
+        record.embedding_id = index
+
+    out_dir = os.path.dirname(args.embeddings_out)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    load.write_embeddings_file(args.embeddings_out, matrix)
+    print(
+        f"wrote {len(records)} embeddings (dim {matrix.shape[1]}) to {args.embeddings_out}",
+        file=sys.stderr,
+    )
+    if not args.skip_db:
+        count = load.load_into_postgis(args.dsn, records)
+        print(f"loaded {count} locations into PostGIS", file=sys.stderr)
+    print(
+        "done — build the index with:\n"
+        f"  cargo run --release --bin build-index -- {args.embeddings_out} data/crypt.index"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_arg_parser().parse_args(argv)
+
+    if args.haunted:
+        return run_haunted(args)
 
     bboxes: list[tuple[float, float, float, float]] = []
     for region in args.region or []:
