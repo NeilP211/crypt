@@ -44,7 +44,7 @@ export default function SavedPage() {
 
   return (
     <div className="mx-auto h-full max-w-3xl overflow-y-auto p-6">
-      <h1 className="font-mono text-lg font-semibold text-bone-200">
+      <h1 className="font-display text-lg font-semibold text-bone-200">
         Saved locations
       </h1>
       <p className="mt-0.5 text-xs text-bone-400">

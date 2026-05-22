@@ -39,7 +39,7 @@ export default function RegisterPage() {
       onSubmit={submit}
       className="w-full max-w-sm rounded-lg border border-ink-700 bg-ink-900 p-6"
     >
-      <h1 className="font-mono text-lg font-semibold text-bone-200">
+      <h1 className="font-display text-lg font-semibold text-bone-200">
         Create an account
       </h1>
       <p className="mt-1 text-xs text-bone-400">

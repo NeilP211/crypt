@@ -16,7 +16,7 @@ export function Nav() {
           className="h-8 w-8 rounded-md shadow-glow"
         />
         <span className="flex items-baseline gap-2">
-          <span className="font-mono text-lg font-bold tracking-[0.3em] text-gold">
+          <span className="font-display text-lg font-bold tracking-[0.3em] text-gold">
             CRYPT
           </span>
           <span className="hidden text-xs text-bone-400 sm:inline">
