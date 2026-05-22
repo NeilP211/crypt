@@ -15,12 +15,12 @@ export function Nav() {
           alt="Crypt"
           className="h-8 w-8 rounded-md shadow-glow"
         />
-        <span className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-bold tracking-[0.3em] text-teal">
-            CRYPT
+        <span className="flex items-baseline gap-2.5">
+          <span className="font-display text-2xl tracking-wide text-teal">
+            Crypt
           </span>
-          <span className="hidden text-xs text-bone-400 sm:inline">
-            geospatial visual search
+          <span className="hidden text-xs italic text-bone-400 sm:inline">
+            haunted places &amp; urban exploration
           </span>
         </span>
       </Link>

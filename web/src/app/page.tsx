@@ -93,12 +93,10 @@ export default function HomePage() {
     <div className="flex h-full">
       <aside className="flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-ink-700 bg-ink-950 p-4">
         <div>
-          <h1 className="font-display text-sm font-semibold text-crimson">
-            Visual search
-          </h1>
+          <h1 className="font-display text-xl text-crimson">Visual Search</h1>
           <p className="mt-0.5 text-xs text-bone-400">
-            Find abandoned places that resemble a photo, ranked by a hybrid of
-            CLIP similarity, distance, and metadata.
+            Drop a photo to uncover haunted and abandoned places that resemble
+            it — ranked by visual similarity, distance, and lore.
           </p>
         </div>
 

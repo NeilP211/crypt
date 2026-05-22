@@ -1,25 +1,32 @@
 import type { Metadata } from "next";
-import { Cinzel, Inter } from "next/font/google";
+import { IM_Fell_English, Pirata_One } from "next/font/google";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
 import { Nav } from "@/components/Nav";
 import { AuthProvider } from "@/lib/auth";
 
-// Inter for UI/body; Cinzel (engraved gothic caps) for the brand and titles,
-// echoing the ornate icon.
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const display = Cinzel({
+// A haunted, weathered type system: Pirata One (gothic blackletter) for the
+// brand and titles; IM Fell English (a 17th-century antique press face) for
+// body — both evoke decay and the uncanny.
+const body = IM_Fell_English({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "900"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-sans",
+  display: "swap",
+});
+const display = Pirata_One({
+  subsets: ["latin"],
+  weight: ["400"],
   variable: "--font-display",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Crypt — Geospatial Visual Search for Urban Exploration",
+  title: "Crypt — Haunted Places & Urban Exploration",
   description:
-    "Upload a photo and find visually similar abandoned and historic places near you.",
+    "Upload a photo and uncover haunted, abandoned, and forgotten places — visual search across thousands of locations.",
 };
 
 export default function RootLayout({
@@ -28,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable}`}>
+    <html lang="en" className={`${body.variable} ${display.variable}`}>
       <body className="flex h-full flex-col font-sans">
         <AuthProvider>
           <Nav />
