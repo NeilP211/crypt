@@ -4,7 +4,7 @@
 
 # Crypt
 
-**Haunted places and urban exploration, by geospatial visual search.**
+**Haunted places and urbex, by geospatial visual search.**
 
 Upload a photo and uncover haunted, abandoned, and forgotten places across the
 country, ranked by visual similarity, distance, and lore.
@@ -22,10 +22,10 @@ country, ranked by visual similarity, distance, and lore.
 
 ## Why
 
+The first rule of urbex is tell no one.
 Discovery for haunted spots and urban-exploration sites is gatekept,
-scattered across private forums, Discord servers, and word of mouth, and the
-tooling that exists is poor. Crypt is the search engine I wanted: point it at
-a photo and it surfaces the eerily similar places, with location, type, and
+scattered across private forums and word of mouth. Crypt is the search engine that takes
+a photo and surfaces the eerily similar places, with location, type, and
 the story behind each one.
 
 ## What it is
@@ -52,12 +52,12 @@ Rust**. The pieces:
 <img src="docs/images/app-search.png" alt="Visual search results" width="100%" />
 
 Drop a photo and Crypt returns ranked matches: numbered pins on the map and
-scored results in the sidebar, blending visual similarity, distance, and lore.
+scored results in the sidebar.
 
 | | |
 |:--|:--|
 | <img src="docs/images/app-detail.png" alt="Location detail panel" /> | <img src="docs/images/app-map.png" alt="Full-bleed haunted map" /> |
-| Every place opens a detail card with a category illustration, the recorded haunting, and links to dig deeper. | Collapse the panel for a full-bleed map: gold gothic labels, crimson water, and teal location pins. |
+| Every place opens a detail card with a category illustration, the recorded haunting, and links to dig deeper. | Collapse the panel for a map |
 
 ## Highlights
 
@@ -219,22 +219,15 @@ Wikidata sources (`--wikidata`) for image-backed places worldwide.
 **Why a photo can search text.** The haunted dataset has descriptions, not
 photos. Because CLIP encodes images and text into the *same* embedding space,
 Crypt embeds each location's caption with CLIP's text encoder and your uploaded
-photo with its image encoder, and compares them directly. So "visual search"
-becomes "find places whose story matches what your photo looks like." The HNSW
+photo with its image encoder, and compares them directly. The HNSW
 index, PostGIS layer, and hybrid ranking are all unchanged.
 
-**The North Carolina bias is intentional.** The ingest keeps every NC location
-and caps every other state (`--boost-state`), so NC is the densest cluster on
-the map. I'm from NC, and the earliest version of Crypt was something I used to
-scout spots around home before opening it up to the rest of the country. The
-concentration is a fossil of how the project started.
 
 ## Design
 
 The visual identity (the candle icon, the teal / crimson / gold palette, and
 the gothic type) is inspired by the **Crypt Candle**, an item from the game
-Albion Online. It set the haunted, dungeon-lit tone the rest of the interface
-follows.
+Albion Online. It used to be my favorite offhand item, and it looks really cool and matches the theme.
 
 ## Notes
 
