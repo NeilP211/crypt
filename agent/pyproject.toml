@@ -1,0 +1,30 @@
+[project]
+name = "crypt-agent"
+version = "0.1.0"
+description = "Hybrid-RAG agent + LLM-judge eval harness over Crypt's haunted-places corpus"
+requires-python = ">=3.10"
+dependencies = [
+    "sentence-transformers>=3.0",
+    "rank-bm25>=0.2",
+    "anthropic>=0.39",
+    "python-dotenv>=1.0",
+    "numpy>=1.24",
+    "hnswlib>=0.8",
+    "kagglehub>=0.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+crypt-agent = "crypt_agent.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["crypt_agent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

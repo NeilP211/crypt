@@ -20,6 +20,17 @@ country, ranked by visual similarity, distance, and lore.
 
 ---
 
+## Ask it questions: hybrid-RAG agent + eval harness
+
+On top of the search platform, [`agent/`](agent/) adds a retrieval-augmented
+**agent** over the 10,959-place corpus: a Claude planner that searches a
+**hybrid retriever** (dense BGE embeddings + BM25, fused with Reciprocal Rank
+Fusion, re-ranked by a cross-encoder), then writes grounded, **`[id]`-cited**
+answers. A companion **LLM-judge eval harness** scores retrieval (recall@1
+**0.96**, MRR **0.97** over 240 queries) and answer faithfulness, catching
+fabrications, location errors, unsupported details, and bad citations. See
+[`agent/README.md`](agent/README.md).
+
 ## Why
 
 The first rule of urbex is tell no one.
