@@ -28,6 +28,13 @@ Answer the user's question ONLY from evidence returned by your tools. Workflow:
 
 Keep answers tight: a few sentences or a short list, each item cited."""
 
+# Used for the local-model (Ollama) path, which retrieves first then answers.
+RAG_SYSTEM = (
+    "You are Crypt, answering questions about haunted and abandoned places "
+    "strictly from the evidence given to you, citing each place's id in square "
+    "brackets. Never invent places or details."
+)
+
 _CITE_RE = re.compile(r"\[(\d+)\]")
 
 
@@ -52,6 +59,10 @@ class CryptAgent:
         self.llm = llm or LLM()
 
     def answer(self, question: str, max_steps: int = 5) -> AgentResult:
+        # The tool-use loop targets Anthropic; the local (Ollama) path uses a
+        # single-shot retrieve-then-answer, reliable on small models.
+        if self.llm.settings.provider != "anthropic":
+            return self._answer_rag(question)
         toolbox = Toolbox(self.retriever)
         messages: list[dict] = [{"role": "user", "content": question}]
         tool_calls_log: list[dict] = []
@@ -102,6 +113,28 @@ class CryptAgent:
             seen_ids=sorted(toolbox.seen),
             steps=steps,
             tool_calls=tool_calls_log,
+        )
+
+
+    def _answer_rag(self, question: str, k: int = 6) -> AgentResult:
+        """Single-shot retrieve-then-answer, used for the local-model path."""
+        hits = self.retriever.search(question, k=k)
+        context = "\n".join(f"[{h.place.id}] {h.place.document()}" for h in hits)
+        prompt = (
+            f"PLACES:\n{context}\n\nQUESTION: {question}\n\n"
+            "Answer using ONLY the places above. After each factual claim, cite the "
+            "place id in square brackets like [12]. If the places do not answer the "
+            "question, say so plainly. Keep it to a few sentences."
+        )
+        resp = self.llm.message([{"role": "user", "content": prompt}], system=RAG_SYSTEM)
+        cited = sorted({int(m) for m in _CITE_RE.findall(resp.text)})
+        return AgentResult(
+            question=question,
+            answer=resp.text,
+            cited_ids=cited,
+            seen_ids=sorted({h.place.id for h in hits}),
+            steps=1,
+            tool_calls=[],
         )
 
 

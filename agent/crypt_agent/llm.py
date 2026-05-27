@@ -50,6 +50,11 @@ class LLM:
         tools: list[dict] | None = None,
         max_tokens: int | None = None,
     ) -> LLMResponse:
+        if self.settings.provider == "ollama":
+            return self._ollama_message(messages, system, max_tokens)
+        return self._anthropic_message(messages, system, tools, max_tokens)
+
+    def _anthropic_message(self, messages, system, tools, max_tokens) -> LLMResponse:
         kwargs: dict = {
             "model": self.settings.model,
             "max_tokens": max_tokens or self.settings.max_tokens,
@@ -73,4 +78,30 @@ class LLM:
             tool_calls=tool_calls,
             stop_reason=resp.stop_reason,
             raw=resp,
+        )
+
+    def _ollama_message(self, messages, system, max_tokens) -> LLMResponse:
+        try:
+            import ollama
+        except ImportError as exc:  # pragma: no cover
+            raise LLMUnavailable("the 'ollama' package is not installed") from exc
+        msgs = ([{"role": "system", "content": system}] if system else []) + list(messages)
+        try:
+            resp = ollama.Client(host=self.settings.ollama_host).chat(
+                model=self.settings.ollama_model,
+                messages=msgs,
+                options={
+                    "temperature": 0.2,
+                    "num_predict": max_tokens or self.settings.max_tokens,
+                },
+            )
+        except Exception as exc:
+            raise LLMUnavailable(
+                f"could not reach local Ollama model '{self.settings.ollama_model}'. "
+                f"Is 'ollama serve' running and the model pulled? ({exc})"
+            ) from exc
+        msg = resp["message"] if isinstance(resp, dict) else resp.message
+        content = msg["content"] if isinstance(msg, dict) else msg.content
+        return LLMResponse(
+            text=(content or "").strip(), tool_calls=[], stop_reason="stop", raw=resp
         )

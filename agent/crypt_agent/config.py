@@ -29,24 +29,40 @@ EMBEDDINGS_PATH = DATA_DIR / "corpus_embeddings.npy"
 
 @dataclass(frozen=True)
 class Settings:
-    """Resolved settings for a single run."""
+    """Resolved settings for a single run.
 
+    ``provider`` is "anthropic" when an API key is present, otherwise "ollama"
+    (a free local model). Both back the same agent + judge code.
+    """
+
+    provider: str  # "anthropic" | "ollama"
     anthropic_api_key: str | None
-    model: str
+    model: str          # Anthropic model id
+    ollama_host: str
+    ollama_model: str
     embed_model: str
     rerank_model: str
     max_tokens: int
 
     @property
     def has_llm(self) -> bool:
-        return bool(self.anthropic_api_key)
+        if self.provider == "anthropic":
+            return bool(self.anthropic_api_key)
+        return True  # ollama path; availability is checked at call time
 
 
 def load_settings() -> Settings:
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    provider = os.environ.get("CRYPT_LLM_PROVIDER", "auto")
+    if provider == "auto":
+        provider = "anthropic" if key else "ollama"
     return Settings(
-        anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY"),
-        # Sonnet is the price/quality sweet spot for an agent loop + judge.
+        provider=provider,
+        anthropic_api_key=key,
+        # Sonnet is the price/quality sweet spot for the hosted path.
         model=os.environ.get("CRYPT_AGENT_MODEL", "claude-sonnet-4-6"),
+        ollama_host=os.environ.get("OLLAMA_HOST", "http://localhost:11434"),
+        ollama_model=os.environ.get("CRYPT_OLLAMA_MODEL", "llama3.2:3b"),
         embed_model=os.environ.get("CRYPT_EMBED_MODEL", "BAAI/bge-small-en-v1.5"),
         rerank_model=os.environ.get(
             "CRYPT_RERANK_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2"

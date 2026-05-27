@@ -28,6 +28,10 @@ export function ResultCard({ result, rank, selected, onOpen }: ResultCardProps) 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Agent-cited places carry no photo-search scores (vec/geo/hybrid/distance)
+  // and aren't in the Rust DB, so hide those chips and the Save button.
+  const isAgent = result.source === "agent";
+
   async function toggleSave() {
     if (!token) {
       setError("sign in to save");
@@ -82,9 +86,11 @@ export function ResultCard({ result, rank, selected, onOpen }: ResultCardProps) 
           <h3 className="truncate text-sm font-semibold text-bone-200">
             {result.name}
           </h3>
-          <span className="shrink-0 font-mono text-sm font-bold text-gold-bright">
-            {formatScore(result.hybrid_score)}
-          </span>
+          {!isAgent && (
+            <span className="shrink-0 font-mono text-sm font-bold text-gold-bright">
+              {formatScore(result.hybrid_score)}
+            </span>
+          )}
         </div>
 
         {(result.structure_type !== "unknown" ||
@@ -114,42 +120,44 @@ export function ResultCard({ result, rank, selected, onOpen }: ResultCardProps) 
           </div>
         )}
 
-        <div className="mt-2 flex items-center justify-between">
-          <dl className="flex gap-3 font-mono text-[10px] text-bone-400">
-            <span>
-              <dt className="inline">vec </dt>
-              <dd className="inline text-bone-300">
-                {formatScore(result.vector_score)}
-              </dd>
-            </span>
-            <span>
-              <dt className="inline">geo </dt>
-              <dd className="inline text-bone-300">
-                {formatScore(result.geo_score)}
-              </dd>
-            </span>
-            {result.distance_meters >= 0 && (
-              <span className="text-bone-300">
-                {formatDistance(result.distance_meters)}
+        {!isAgent && (
+          <div className="mt-2 flex items-center justify-between">
+            <dl className="flex gap-3 font-mono text-[10px] text-bone-400">
+              <span>
+                <dt className="inline">vec </dt>
+                <dd className="inline text-bone-300">
+                  {formatScore(result.vector_score)}
+                </dd>
               </span>
-            )}
-          </dl>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              void toggleSave();
-            }}
-            disabled={busy}
-            className={
-              "rounded border px-2 py-0.5 text-[11px] transition disabled:opacity-50 " +
-              (saved
-                ? "border-teal bg-teal/15 text-teal-bright"
-                : "border-ink-600 text-bone-300 hover:border-teal")
-            }
-          >
-            {saved ? "Saved" : "Save"}
-          </button>
-        </div>
+              <span>
+                <dt className="inline">geo </dt>
+                <dd className="inline text-bone-300">
+                  {formatScore(result.geo_score)}
+                </dd>
+              </span>
+              {result.distance_meters >= 0 && (
+                <span className="text-bone-300">
+                  {formatDistance(result.distance_meters)}
+                </span>
+              )}
+            </dl>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                void toggleSave();
+              }}
+              disabled={busy}
+              className={
+                "rounded border px-2 py-0.5 text-[11px] transition disabled:opacity-50 " +
+                (saved
+                  ? "border-teal bg-teal/15 text-teal-bright"
+                  : "border-ink-600 text-bone-300 hover:border-teal")
+              }
+            >
+              {saved ? "Saved" : "Save"}
+            </button>
+          </div>
+        )}
         {result.description && (
           <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-bone-400">
             {result.description}
