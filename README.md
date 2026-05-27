@@ -14,7 +14,7 @@ country, ranked by visual similarity, distance, and lore.
 
 <br />
 
-<img src="docs/images/demo.gif" alt="Crypt demo: drop a photo, get ranked haunted places on the map" width="840" />
+<img src="docs/images/demo.gif" alt="Crypt demo: ask a question and get cited haunted places pinned on the map" width="840" />
 
 </div>
 
@@ -60,15 +60,15 @@ Rust**. The pieces:
 
 ## Screenshots
 
-<img src="docs/images/app-search.png" alt="Visual search results" width="100%" />
+<img src="docs/images/app-search.png" alt="Ask the Crypt: cited places in the sidebar, pinned on the map" width="100%" />
 
-Drop a photo and Crypt returns ranked matches: numbered pins on the map and
-scored results in the sidebar.
+Ask the Crypt a question and the agent answers with cited places: listed in the
+sidebar and pinned on the map (here, haunted cemeteries across Illinois).
 
 | | |
 |:--|:--|
-| <img src="docs/images/app-detail.png" alt="Location detail panel" /> | <img src="docs/images/app-map.png" alt="Full-bleed haunted map" /> |
-| Every place opens a detail card with a category illustration, the recorded haunting, and links to dig deeper. | Collapse the panel for a map |
+| <img src="docs/images/app-detail.png" alt="Location detail panel" /> | <img src="docs/images/app-map.png" alt="The Ask box beside the full haunted map" /> |
+| Every place opens a detail card with a category illustration, the recorded haunting, and links to dig deeper. | The Ask box and visual search sit beside the full haunted-places map. |
 
 ## Highlights
 

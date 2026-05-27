@@ -6,6 +6,8 @@ retrieval stack with a tool-using planner and a faithfulness eval harness, so
 every answer is grounded in retrieved evidence and the whole pipeline is
 measured, not vibes.
 
+<img src="../docs/images/demo.gif" alt="Ask the Crypt: a question returns cited places pinned on the map" width="840" />
+
 ## What it does
 
 ```
