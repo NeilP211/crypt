@@ -144,3 +144,79 @@ export const api = {
   contributions: (token: string) =>
     request<Contribution[]>("/api/contributions", {}, token),
 };
+
+// --- Crypt Agent (RAG) service: a separate Python FastAPI service. ----------
+const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8088";
+
+export interface AgentPlace {
+  id: number;
+  name: string;
+  city: string;
+  state: string;
+  structure_type: string;
+  lat: number;
+  lng: number;
+  description: string;
+  rerank_score?: number | null;
+}
+
+export interface AgentAnswer {
+  question: string;
+  answer: string;
+  grounded: boolean;
+  steps: number;
+  cited: AgentPlace[];
+}
+
+async function agentRequest<T>(path: string, body: unknown): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${AGENT_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError(0, "could not reach the Crypt agent service");
+  }
+  if (!response.ok) {
+    let message = response.statusText;
+    try {
+      const b = (await response.json()) as { detail?: string };
+      if (b.detail) message = b.detail;
+    } catch {
+      /* no JSON body */
+    }
+    throw new ApiError(response.status, message);
+  }
+  return (await response.json()) as T;
+}
+
+export const agentApi = {
+  ask: (question: string) => agentRequest<AgentAnswer>("/ask", { question }),
+  search: (query: string, k = 6) =>
+    agentRequest<{ results: AgentPlace[] }>("/search", { query, k }),
+};
+
+/** Adapt an agent place into the ScoredLocation shape the map + list render. */
+export function agentPlaceToLocation(p: AgentPlace): ScoredLocation {
+  const place = [p.city, p.state].filter(Boolean).join(", ");
+  return {
+    id: `agent-${p.id}`,
+    embedding_id: null,
+    name: place ? `${p.name} (${place})` : p.name,
+    description: p.description,
+    lat: p.lat,
+    lng: p.lng,
+    era: "unknown",
+    structure_type: p.structure_type,
+    verified_status: "unverified",
+    image_url: "",
+    source: "agent",
+    vector_score: 0,
+    geo_score: 0,
+    metadata_score: 0,
+    hybrid_score: p.rerank_score ?? 0,
+    distance_meters: 0,
+  };
+}

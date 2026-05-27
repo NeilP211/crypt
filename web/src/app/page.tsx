@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { AskPanel } from "@/components/AskPanel";
 import { BetaCard } from "@/components/BetaCard";
 import { Filters } from "@/components/Filters";
 import { categoryOf } from "@/components/HauntedGraphics";
@@ -113,6 +114,19 @@ export default function HomePage() {
     [openDetail],
   );
 
+  // The Ask agent returns cited places: route them through the same results
+  // path as a photo search so they list in the sidebar and pin on the map.
+  const handleAgentCited = useCallback((places: ScoredLocation[]) => {
+    setResults(places);
+    setSearched(true);
+    setPreview(null);
+    setError(null);
+    setSelectedId(places[0]?.id ?? null);
+    if (places[0]?.lat != null && places[0]?.lng != null) {
+      setFocus({ lat: places[0].lat, lng: places[0].lng });
+    }
+  }, []);
+
   return (
     <div className="relative flex h-full overflow-hidden">
       <aside
@@ -144,6 +158,8 @@ export default function HomePage() {
             </svg>
           </button>
         </div>
+
+        <AskPanel onCited={handleAgentCited} />
 
         <NameSearch onPick={pickFromSearch} />
 
