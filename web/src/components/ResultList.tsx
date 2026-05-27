@@ -45,11 +45,14 @@ export function ResultList({
     );
   }
 
+  const isAgent = results.length > 0 && results[0].source === "agent";
+
   return (
     <div className="flex flex-col gap-2">
       <p className="px-1 font-mono text-xs text-bone-400">
-        {results.length} result{results.length === 1 ? "" : "s"}, ranked by
-        hybrid score
+        {results.length} {isAgent ? "place" : "result"}
+        {results.length === 1 ? "" : "s"}{" "}
+        {isAgent ? "cited by the agent" : "ranked by hybrid score"}
       </p>
       {results.map((result, index) => (
         <ResultCard
