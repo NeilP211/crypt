@@ -70,10 +70,12 @@ class AskRequest(BaseModel):
 @app.get("/health")
 def health() -> dict:
     settings = load_settings()
+    active_model = settings.model if settings.provider == "anthropic" else settings.ollama_model
     return {
         "ok": True,
+        "provider": settings.provider,
         "has_llm": settings.has_llm,
-        "model": settings.model if settings.has_llm else None,
+        "model": active_model,
         "corpus_size": len(_retriever().places),
     }
 

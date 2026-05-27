@@ -28,6 +28,8 @@ class FakeLLM:
     def __init__(self, responses):
         self.responses = list(responses)
         self.calls = 0
+        # The agent reads provider to pick the tool-loop vs the RAG path.
+        self.settings = SimpleNamespace(provider="anthropic")
 
     def message(self, messages, system=None, tools=None, max_tokens=None):
         resp = self.responses[self.calls]
@@ -64,6 +66,19 @@ def test_agent_runs_tools_then_answers_grounded():
     assert result.grounded is True     # cited only what it retrieved
     assert result.steps == 2
     assert result.tool_calls[0]["name"] == "search_places"
+
+
+def test_agent_rag_path_for_local_provider():
+    # A non-anthropic provider uses single-shot retrieve-then-answer.
+    llm = FakeLLM([_final("The most haunted hospital is Waverly Hills [0].")])
+    llm.settings = SimpleNamespace(provider="ollama")
+    agent = CryptAgent(retriever=FakeRetriever(), llm=llm)
+    result = agent.answer("what is the most haunted hospital?")
+    assert result.cited_ids == [0]
+    assert result.seen_ids == [0]
+    assert result.grounded is True
+    assert result.steps == 1
+    assert llm.calls == 1  # one shot, no tool loop
 
 
 def test_agent_flags_ungrounded_citation():
