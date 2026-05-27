@@ -20,6 +20,8 @@ country, ranked by visual similarity, distance, and lore.
 
 ---
 
+![NEW](https://img.shields.io/badge/NEW-e0455a?style=for-the-badge)
+
 ## Ask it questions: hybrid-RAG agent + eval harness
 
 On top of the search platform, [`agent/`](agent/) adds a retrieval-augmented
